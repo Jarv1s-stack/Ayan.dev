@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayan Abdimutalip — Frontend & AI Developer</title>
+<meta name="description" content="Portfolio of Ayan Abdimutalip — Frontend & ChatBot/AI developer based in Almaty, Kazakhstan.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="ghibli-photo.png" type="image/png">
+</head>
+<body data-theme="dark">
+
+<div id="scroll-progress"></div>
+
+<header>
+  <div class="logo"><span class="dim">&lt;</span>Ayan<span class="dim">/&gt;</span><span class="cursor-blink"></span></div>
+
+  <nav id="nav">
+    <a href="#home" class="active" data-i18n="nav_home"><span class="idx">01</span>Home</a>
+    <a href="#about" data-i18n="nav_about"><span class="idx">02</span>About</a>
+    <a href="#skills" data-i18n="nav_skills"><span class="idx">03</span>Skills</a>
+    <a href="#resume" data-i18n="nav_resume"><span class="idx">04</span>Journey</a>
+    <a href="#contact" data-i18n="nav_contact"><span class="idx">05</span>Contact</a>
+  </nav>
+
+  <div class="header-actions">
+    <button class="kbd-hint" id="cmdk-trigger" title="Command palette"><i class="fa-solid fa-terminal"></i><span data-i18n="cmdk_hint">Quick nav</span><kbd>Ctrl</kbd><kbd>K</kbd></button>
+    <div class="social-icons">
+      <a href="https://github.com/Jarv1s-stack" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
+      <a href="https://www.linkedin.com/in/ayan-abdimutalip-5a5b5a2b5/" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
+      <a href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-telegram"></i></a>
+    </div>
+    <select class="lang-toggle" id="lang-toggle">
+      <option value="en">EN</option>
+      <option value="ru">RU</option>
+    </select>
+    <button class="icon-btn theme-toggle" id="theme-toggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
+    <button class="mobile-menu-btn" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section id="home" class="welcome">
+  <canvas id="net-canvas"></canvas>
+  <div class="wrap">
+    <div class="hero-copy">
+      <div class="avail"><span class="dot-pulse"></span><span data-i18n="hero_avail">Open to opportunities</span></div>
+      <p class="hello" data-i18n="welcome_hello">Hello, I'm</p>
+      <h1>Abdimutalip <span class="hl">Ayan</span></h1>
+      <h2 id="typed-role"></h2>
+      <div class="buttons">
+        <a href="#contact" class="btn"><i class="fa-solid fa-paper-plane"></i><span data-i18n="welcome_contact">Contact Me</span></a>
+        <a href="#about" class="btn outline"><span data-i18n="welcome_learn">Learn More</span></a>
+      </div>
+      <div class="hero-meta">
+        <span><b>Almaty,</b> Kazakhstan</span>
+        <span class="gh-live" id="gh-live"><i class="fab fa-github"></i> <span id="gh-live-text">loading github…</span></span>
+      </div>
+    </div>
+
+    <div class="editor-window">
+      <div class="editor-titlebar">
+        <div class="traffic"><span></span><span></span><span></span></div>
+        <div class="editor-tabs">
+          <span class="active">about.js</span>
+          <span>skills.json</span>
+          <span>contact.md</span>
+        </div>
+      </div>
+      <div class="editor-body">
+        <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
+        <div class="code-content"><span id="type-target"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="about">
+  <div class="wrap">
+    <div class="about-media reveal">
+      <div class="about-img-frame">
+        <img src="myPhoto.jpg" alt="Ayan Abdimutalip" class="about-img">
+        <div class="about-tag">01_about.jpg</div>
+      </div>
+    </div>
+    <div class="about-content">
+      <div class="eyebrow" data-i18n="about_eyebrow">Who I am</div>
+      <h2 class="section-header-inline" data-i18n="about_title" style="font-family:var(--font-display);font-size:clamp(1.9rem,3vw,2.6rem);font-weight:700;margin:0 0 20px;letter-spacing:-.02em;">About me</h2>
+      <p class="lead" data-i18n="about_content">I am a <span class="hl">front-end developer</span> who creates websites quickly and efficiently. Passionate about building interactive, AI-powered and user-friendly web applications.</p>
+
+      <div class="info-grid reveal-stagger">
+        <div class="info-card"><div class="label" data-i18n="about_fullname">Fullname</div><div class="value">Abdimutalip Ayan</div></div>
+        <div class="info-card"><div class="label" data-i18n="about_dob">Date of birth</div><div class="value">June 15, 2005</div></div>
+        <div class="info-card"><div class="label" data-i18n="about_address">Address</div><div class="value">Almaty, Kazakhstan</div></div>
+        <div class="info-card"><div class="label" data-i18n="about_telegram">Telegram</div><div class="value"><a href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener">@ayanabdimutalip</a></div></div>
+      </div>
+
+      <div class="stat-row reveal-stagger">
+        <div class="stat-box"><span class="number" data-count="10">0</span><span class="label" data-i18n="about_stats">Projects complete</span></div>
+        <div class="stat-box"><span class="number" data-count="9">0</span><span class="label" data-i18n="about_certs">Certificates earned</span></div>
+        <div class="stat-box"><span class="number" data-count="3">0</span><span class="label" data-i18n="about_tools">Design tools</span></div>
+      </div>
+
+      <div class="dateButtons">
+        <a href="https://drive.google.com/file/d/1uW5i5i5i5i5i5i5i5i5i5i5i5i5i5i5i/view?usp=sharing" target="_blank" rel="noopener" class="btn"><i class="fa-solid fa-download"></i><span data-i18n="about_download_cv">Download CV</span></a>
+        <a href="https://github.com/ayanabdimutalip?tab=repositories" target="_blank" rel="noopener" class="btn outline"><i class="fa-brands fa-github"></i><span data-i18n="about_my_projects">My Projects</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SKILLS ================= -->
+<section id="skills" class="skills-section">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="eyebrow" data-i18n="skills_eyebrow">Capabilities</div>
+      <h2 data-i18n="skills_title">My Skills</h2>
+      <p data-i18n="skills_desc">I have expertise in various web technologies and design tools that help me build modern, polished web applications from concept to code.</p>
+    </div>
+
+    <div class="skills-tabs reveal">
+      <button class="skills-tab-btn active" data-tab="dev" data-i18n="skills_tab_dev">Development</button>
+      <button class="skills-tab-btn" data-tab="design" data-i18n="skills_tab_design">Design Tools</button>
+    </div>
+
+    <div class="skills-panel active" id="panel-dev">
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-html5"></i>HTML</span><span class="pct">99%</span></div><div class="progress-bar"><div class="progress" data-pct="99"></div></div></div>
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-css3-alt"></i>CSS</span><span class="pct">94%</span></div><div class="progress-bar"><div class="progress" data-pct="94"></div></div></div>
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-js"></i>JavaScript</span><span class="pct">97%</span></div><div class="progress-bar"><div class="progress" data-pct="97"></div></div></div>
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-react"></i>React</span><span class="pct">85%</span></div><div class="progress-bar"><div class="progress" data-pct="85"></div></div></div>
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-solid fa-robot"></i><span data-i18n="skill_chatbot">ChatBot Development</span></span><span class="pct">90%</span></div><div class="progress-bar"><div class="progress" data-pct="90"></div></div></div>
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-git-alt"></i>Git &amp; Version Control</span><span class="pct">88%</span></div><div class="progress-bar"><div class="progress" data-pct="88"></div></div></div>
+    </div>
+
+    <div class="skills-panel" id="panel-design">
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-figma"></i>Figma</span><span class="pct">93%</span></div><div class="progress-bar"><div class="progress design" data-pct="93"></div></div></div>
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-adobe"></i>Adobe Illustrator</span><span class="pct">82%</span></div><div class="progress-bar"><div class="progress design" data-pct="82"></div></div></div>
+      <div class="skill-item"><div class="skill-info"><span class="name"><i class="fa-brands fa-adobe"></i>Adobe Photoshop</span><span class="pct">64%</span></div><div class="progress-bar"><div class="progress design" data-pct="64"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESUME / JOURNEY ================= -->
+<section id="resume" class="resume-section">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="eyebrow" data-i18n="resume_eyebrow">git log --graph</div>
+      <h2 data-i18n="resume_title">My Journey</h2>
+      <p data-i18n="resume_desc">A changelog of courses, certificates and milestones along the way.</p>
+    </div>
+
+    <div class="journey-tree reveal-stagger">
+      <div class="journey-item">
+        <div class="commit-line"><span class="hash">#a1</span><span class="tag">certificate</span></div>
+        <h4>Meta Front-End Developer Professional Certificate</h4>
+        <div class="meta">Meta · Mar 2025</div>
+      </div>
+      <div class="journey-item">
+        <div class="commit-line"><span class="hash">#a2</span><span class="tag">course</span></div>
+        <h4>Advanced React &amp; Front-End Developer Capstone</h4>
+        <div class="meta">Meta · Mar 2025</div>
+      </div>
+      <div class="journey-item">
+        <div class="commit-line"><span class="hash">#a3</span><span class="tag">course</span></div>
+        <h4>Principles of UX/UI Design</h4>
+        <div class="meta">Meta · Mar 2025</div>
+      </div>
+      <div class="journey-item">
+        <div class="commit-line"><span class="hash">#a4</span><span class="tag">foundation</span></div>
+        <h4>HTML/CSS in Depth, Version Control, Coding Interview Prep</h4>
+        <div class="meta">Meta · Mar 2025</div>
+      </div>
+    </div>
+
+    <div class="resume-container">
+      <div class="resume-column reveal">
+        <h3 data-i18n="resume_certificates">Certificates</h3>
+        <div class="certificates-grid" id="cert-grid">
+          <div class="certificate-card" data-cert="Advanced-React"><h4>Advanced React</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="Front-End-Developer-Capstone"><h4>Front-End Developer Capstone</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="Coding-Interview-Preparation"><h4>Coding Interview Preparation</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="HTML-and-CSS-in-depth"><h4>HTML and CSS in depth</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="Introduction-to-Front-End-Development"><h4>Intro to Front-End Development</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="Version-Control"><h4>Version Control</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="Principles-of-UX-UI-Design"><h4>Principles of UX/UI Design</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="Programming-with-JavaScript"><h4>Programming with JavaScript</h4><span>Meta — Mar 2025</span></div>
+          <div class="certificate-card" data-cert="React-Basics"><h4>React Basics</h4><span>Meta — Mar 2025</span></div>
+        </div>
+      </div>
+      <div class="resume-column reveal">
+        <h3 data-i18n="resume_skills">Skills</h3>
+        <div class="skills-tags">
+          <span>HTML</span><span>CSS</span><span>JavaScript</span><span>React</span><span>Git</span>
+          <span data-i18n="skill_chatbot">ChatBot Development</span><span>Figma</span><span>Illustrator</span><span data-i18n="tag_responsive">Responsive Design</span><span>APIs</span>
+        </div>
+        <h3 data-i18n="resume_professional">Professional Certificate</h3>
+        <div class="professional-cert" data-cert="Meta-Front-End-Developer">
+          <img src="Meta-Front-End-Developer.png" alt="Meta Front-End Developer Certificate">
+          <div>
+            <span class="badge">VERIFIED</span>
+            <h4>Meta Front-End Developer</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="contact-section">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="eyebrow" data-i18n="contact_eyebrow">Say hello</div>
+      <h2 data-i18n="contact_title">Get In Touch</h2>
+      <p data-i18n="contact_desc">Feel free to reach out to me for any questions or opportunities.</p>
+    </div>
+    <div class="contact-container">
+      <div class="contact-info reveal-stagger">
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <div><h3 data-i18n="contact_location">Location</h3><p>Almaty, Kazakhstan</p></div>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-envelope"></i>
+          <div><h3 data-i18n="contact_email">Email</h3><p id="email-text">ayanabdimutalip@gmail.com</p></div>
+          <button class="copy-btn" id="copy-email" title="Copy email"><i class="fa-regular fa-copy"></i></button>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-phone"></i>
+          <div><h3 data-i18n="contact_phone">Phone</h3><p>+7 (700) 344-23-97</p></div>
+        </div>
+        <div class="local-time-box">
+          <div class="lbl" data-i18n="contact_localtime">Local time in Almaty</div>
+          <div class="val" id="local-time">--:--:--</div>
+        </div>
+      </div>
+      <form class="contact-form" id="contactForm">
+        <div class="form-group">
+          <div class="form-field"><input type="text" name="name" placeholder=" " required><label data-i18n="contact_form_name">Your Name</label></div>
+          <div class="form-field"><input type="tel" name="phone" placeholder=" " required><label data-i18n="contact_form_phone">Your Phone</label></div>
+        </div>
+        <div class="form-group">
+          <div class="form-field"><input type="email" name="email" placeholder=" " required><label data-i18n="contact_form_email">Your Email</label></div>
+          <div class="form-field"><input type="text" name="telegram" placeholder=" "><label data-i18n="contact_form_telegram">Telegram (optional)</label></div>
+        </div>
+        <div class="form-group">
+          <div class="form-field"><input type="text" name="subject" placeholder=" " required><label data-i18n="contact_form_subject">Subject</label></div>
+        </div>
+        <div class="form-group">
+          <div class="form-field"><textarea name="message" placeholder=" " required></textarea><label data-i18n="contact_form_message">Your Message</label></div>
+        </div>
+        <button type="submit" class="submit-btn"><i class="fa-solid fa-paper-plane"></i><span data-i18n="contact_form_submit">Send Message</span></button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-content">
+      <div>
+        <div class="logo">Ayan</div>
+        <p data-i18n="footer_role">Frontend &amp; ChatBot Developer</p>
+      </div>
+      <div class="social-links">
+        <a href="https://github.com/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/ayan-abdimutalip-5a5b5a2b5/" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
+        <a href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-telegram"></i></a>
+      </div>
+    </div>
+    <div class="copyright"><p>© <span id="year"></span> Abdimutalip Ayan. <span data-i18n="footer_rights">All rights reserved.</span></p></div>
+  </div>
+</footer>
+
+<button class="to-top" id="to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+<!-- Certificate modal -->
+<div id="certificateModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="modal-close">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <div class="modal-body"><img id="modalImage" alt="Certificate Image"></div>
+    <div class="modal-nav">
+      <button id="modal-prev"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="modal_prev">Prev</span></button>
+      <button id="modal-next"><span data-i18n="modal_next">Next</span> <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Command palette -->
+<div class="cmdk-overlay" id="cmdk-overlay">
+  <div class="cmdk-box">
+    <div class="cmdk-input-row">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="cmdk-input" placeholder="Type a command or search…" autocomplete="off">
+      <span class="cmdk-esc">ESC</span>
+    </div>
+    <div class="cmdk-list" id="cmdk-list"></div>
+  </div>
+</div>
+
+<div id="toast-stack"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

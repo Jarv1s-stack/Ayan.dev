@@ -19,7 +19,7 @@
   const CONFIG = {
     // Your Gemini API key, used directly from the browser. Exposed to anyone
     // who views page source / devtools — see warning above.
-    apiKey: 'AQ.Ab8RN6KevhHLw2yZ1G37b-XinWovFi2fwBcbGIH1omqNWRDTqw',
+    apiKey: 'AQ.Ab8RN6I74jaKqTngZw_FoKo5ijwgVt9DMDremZDH1sa19L2YpQ',
     model: 'gemini-3.5-flash-lite', // актуальная быстрая/дешёвая модель на замену снятой gemini-2.5-flash
     maxHistoryMessages: 16, // how many past turns are sent back to the model
   };

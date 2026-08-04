@@ -540,15 +540,15 @@ footer{ border-top:1px solid var(--border); padding: 40px 0; }
 
 /* ---------------- mouse fx: cursor glow ---------------- */
 #cursor-glow{
-  position: fixed; top:0; left:0; width: 460px; height: 460px; z-index: 850;
+  position: fixed; top:0; left:0; width: 320px; height: 320px; z-index: 850;
   pointer-events: none; border-radius: 50%; opacity: 0;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 70%);
   mix-blend-mode: screen; will-change: transform, opacity;
   transition: opacity .4s var(--ease);
 }
 [data-theme="light"] #cursor-glow{
   mix-blend-mode: multiply;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 7%, transparent) 0%, transparent 70%);
 }
 #cursor-glow.active{ opacity: 1; }
 @media (hover: none), (pointer: coarse){ #cursor-glow{ display:none; } }

@@ -11,6 +11,18 @@
 </head>
 <body data-theme="dark">
 
+<canvas id="net-canvas"></canvas>
+<div id="cursor-glow"></div>
+
+<div id="boot-screen">
+  <div class="boot-box">
+    <div class="boot-row"><span class="boot-prompt">&gt;</span><span id="boot-title-text"></span><span class="boot-caret"></span></div>
+    <div class="boot-tasks" id="boot-tasks"></div>
+    <div class="boot-row boot-welcome" id="boot-welcome"></div>
+  </div>
+  <div class="boot-skip" id="boot-skip"></div>
+</div>
+
 <div id="scroll-progress"></div>
 
 <header>
@@ -42,7 +54,6 @@
 
 <!-- ================= HERO ================= -->
 <section id="home" class="welcome">
-  <canvas id="net-canvas"></canvas>
   <div class="wrap">
     <div class="hero-copy">
       <div class="avail"><span class="dot-pulse"></span><span data-i18n="hero_avail">Open to opportunities</span></div>

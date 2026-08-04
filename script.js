@@ -1,5 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ===================== crash-safe storage (private mode / sandboxed frames) ===================== */
+  const memStore = {};
+  function safeGet(store, key) {
+    try { return window[store].getItem(key); } catch (e) { return (key in memStore) ? memStore[key] : null; }
+  }
+  function safeSet(store, key, val) {
+    memStore[key] = val;
+    try { window[store].setItem(key, val); } catch (e) { /* fall back to memory only */ }
+  }
+
+  /* ===================== shared mouse tracker (live bg + cursor glow) ===================== */
+  const mouse = { x: null, y: null, active: false };
+  if (isFinePointer) {
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+    }, { passive: true });
+    document.addEventListener('mouseleave', () => { mouse.active = false; });
+  }
 
   /* ===================== i18n ===================== */
   const translations = {
@@ -38,7 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
       cmdk_nav: 'Navigate', cmdk_actions: 'Actions', cmdk_empty: 'No results found.',
       cmd_home: 'Go to Home', cmd_about: 'Go to About', cmd_skills: 'Go to Skills', cmd_journey: 'Go to Journey', cmd_contact: 'Go to Contact',
       cmd_theme: 'Toggle light / dark theme', cmd_lang: 'Switch language (EN / RU)', cmd_copy: 'Copy email address',
-      cmd_gh: 'Open GitHub profile', cmd_li: 'Open LinkedIn profile', cmd_tg: 'Open Telegram'
+      cmd_gh: 'Open GitHub profile', cmd_li: 'Open LinkedIn profile', cmd_tg: 'Open Telegram',
+      boot_title: 'Booting Ayan.dev...',
+      boot_task_projects: 'Loading Projects', boot_task_ai: 'Loading AI Systems', boot_task_creativity: 'Loading Creativity',
+      boot_welcome: 'Welcome, Human.', boot_skip: 'press any key to skip'
     },
     ru: {
       nav_home: 'Главная', nav_about: 'Обо мне', nav_skills: 'Навыки', nav_resume: 'Путь', nav_contact: 'Контакты',
@@ -75,11 +98,14 @@ document.addEventListener('DOMContentLoaded', function () {
       cmdk_nav: 'Навигация', cmdk_actions: 'Действия', cmdk_empty: 'Ничего не найдено.',
       cmd_home: 'Перейти на Главную', cmd_about: 'Перейти в Обо мне', cmd_skills: 'Перейти в Навыки', cmd_journey: 'Перейти в Путь', cmd_contact: 'Перейти в Контакты',
       cmd_theme: 'Переключить тему', cmd_lang: 'Сменить язык (EN / RU)', cmd_copy: 'Скопировать email',
-      cmd_gh: 'Открыть GitHub', cmd_li: 'Открыть LinkedIn', cmd_tg: 'Открыть Telegram'
+      cmd_gh: 'Открыть GitHub', cmd_li: 'Открыть LinkedIn', cmd_tg: 'Открыть Telegram',
+      boot_title: 'Загрузка Ayan.dev...',
+      boot_task_projects: 'Загрузка проектов', boot_task_ai: 'Загрузка AI-систем', boot_task_creativity: 'Загрузка креативности',
+      boot_welcome: 'Добро пожаловать, Человек.', boot_skip: 'нажмите любую клавишу, чтобы пропустить'
     }
   };
 
-  let currentLang = localStorage.getItem('lang') || 'en';
+  let currentLang = safeGet('localStorage', 'lang') || 'en';
   const langToggle = document.getElementById('lang-toggle');
   langToggle.value = currentLang;
 
@@ -94,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function setLang(lang) {
     currentLang = lang;
-    localStorage.setItem('lang', lang);
+    safeSet('localStorage', 'lang', lang);
     langToggle.value = lang;
     applyTranslations(lang);
     restartRoleTyping();
@@ -105,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ===================== theme ===================== */
   const themeToggle = document.getElementById('theme-toggle');
-  const currentTheme = localStorage.getItem('theme') || 'dark';
+  const currentTheme = safeGet('localStorage', 'theme') || 'dark';
   document.documentElement.setAttribute('data-theme', currentTheme);
   updateThemeIcon(currentTheme);
   function updateThemeIcon(theme) {
@@ -114,10 +140,98 @@ document.addEventListener('DOMContentLoaded', function () {
   function toggleTheme() {
     const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+    safeSet('localStorage', 'theme', newTheme);
     updateThemeIcon(newTheme);
   }
   themeToggle.addEventListener('click', toggleTheme);
+
+  /* ===================== boot sequence ===================== */
+  (function initBoot() {
+    const bootScreen = document.getElementById('boot-screen');
+    if (!bootScreen) return;
+
+    const alreadyPlayed = safeGet('sessionStorage', 'bootPlayed') === '1';
+    if (alreadyPlayed || reduceMotion) {
+      safeSet('sessionStorage', 'bootPlayed', '1');
+      bootScreen.remove();
+      return;
+    }
+
+    document.body.style.overflow = 'hidden';
+    const t = translations[currentLang];
+    const titleEl = document.getElementById('boot-title-text');
+    const tasksEl = document.getElementById('boot-tasks');
+    const welcomeEl = document.getElementById('boot-welcome');
+    const skipEl = document.getElementById('boot-skip');
+    skipEl.textContent = t.boot_skip;
+
+    const tasks = [
+      { label: t.boot_task_projects, icon: 'fa-folder-tree' },
+      { label: t.boot_task_ai, icon: 'fa-brain' },
+      { label: t.boot_task_creativity, icon: 'fa-wand-magic-sparkles' }
+    ];
+    tasksEl.innerHTML = tasks.map(task =>
+      `<div class="boot-task">
+        <span class="boot-task-label"><i class="fa-solid ${task.icon}"></i>${task.label}</span>
+        <span class="boot-bar"><span class="boot-bar-fill"></span></span>
+        <span class="boot-pct">0%</span>
+      </div>`
+    ).join('');
+    const taskRows = tasksEl.querySelectorAll('.boot-task');
+
+    let skipped = false;
+    function onSkip() { skipped = true; }
+    document.addEventListener('keydown', onSkip, { once: true });
+    bootScreen.addEventListener('click', onSkip, { once: true });
+
+    function typeText(el, text, speed) {
+      return new Promise(resolve => {
+        let i = 0;
+        el.textContent = '';
+        (function step() {
+          if (skipped) { el.textContent = text; resolve(); return; }
+          i++;
+          el.textContent = text.slice(0, i);
+          if (i < text.length) setTimeout(step, speed);
+          else resolve();
+        })();
+      });
+    }
+
+    function animateTask(row, duration) {
+      return new Promise(resolve => {
+        row.classList.add('show');
+        const fill = row.querySelector('.boot-bar-fill');
+        const pctEl = row.querySelector('.boot-pct');
+        if (skipped) { fill.style.width = '100%'; pctEl.textContent = '100%'; resolve(); return; }
+        const start = performance.now();
+        fill.style.transitionDuration = duration + 'ms';
+        requestAnimationFrame(() => { fill.style.width = '100%'; });
+        (function tick(now) {
+          if (skipped) { fill.style.width = '100%'; pctEl.textContent = '100%'; resolve(); return; }
+          const p = Math.min(1, (now - start) / duration);
+          pctEl.textContent = Math.round(p * 100) + '%';
+          if (p < 1) requestAnimationFrame(tick); else resolve();
+        })(start);
+      });
+    }
+
+    async function runBoot() {
+      await typeText(titleEl, t.boot_title, 32);
+      for (const row of taskRows) {
+        await animateTask(row, 620 + Math.random() * 260);
+      }
+      welcomeEl.textContent = t.boot_welcome;
+      welcomeEl.classList.add('show');
+      await new Promise(r => setTimeout(r, skipped ? 200 : 750));
+      bootScreen.classList.add('fade-out');
+      await new Promise(r => setTimeout(r, 550));
+      document.body.style.overflow = '';
+      safeSet('sessionStorage', 'bootPlayed', '1');
+      bootScreen.remove();
+    }
+    runBoot();
+  })();
 
   /* ===================== header / scroll progress / active nav ===================== */
   const header = document.querySelector('header');
@@ -326,20 +440,24 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   typeCode();
 
-  /* ===================== hero: network canvas ===================== */
+  /* ===================== sitewide live background: network canvas ===================== */
   const canvas = document.getElementById('net-canvas');
   if (canvas && !reduceMotion) {
     const ctx = canvas.getContext('2d');
-    let w, h, nodes;
-    const heroSection = document.querySelector('.welcome');
+    let w, h, dpr, nodes;
+    const LINK_DIST = 130;
+    const MOUSE_DIST = 160;
 
     function resize() {
-      w = canvas.width = heroSection.offsetWidth;
-      h = canvas.height = heroSection.offsetHeight;
-      const count = Math.min(70, Math.round((w * h) / 22000));
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.min(110, Math.round((w * h) / 16000));
       nodes = Array.from({ length: count }, () => ({
         x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35
+        vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3
       }));
     }
     resize();
@@ -350,18 +468,31 @@ document.addEventListener('DOMContentLoaded', function () {
     function draw() {
       ctx.clearRect(0, 0, w, h);
       const color = accent();
+
       nodes.forEach(n => {
         n.x += n.vx; n.y += n.vy;
         if (n.x < 0 || n.x > w) n.vx *= -1;
         if (n.y < 0 || n.y > h) n.vy *= -1;
+
+        /* nodes gently drift away from the cursor, like the network "feels" you move through it */
+        if (mouse.active && mouse.x !== null) {
+          const dx = n.x - mouse.x, dy = n.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_DIST && dist > 0.01) {
+            const force = (1 - dist / MOUSE_DIST) * 0.6;
+            n.x += (dx / dist) * force;
+            n.y += (dy / dist) * force;
+          }
+        }
       });
+
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 130) {
+          if (dist < LINK_DIST) {
             ctx.strokeStyle = color;
-            ctx.globalAlpha = (1 - dist / 130) * 0.35;
+            ctx.globalAlpha = (1 - dist / LINK_DIST) * 0.32;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
@@ -370,6 +501,29 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       }
+
+      /* cursor-to-node links: the network reaches toward you */
+      if (mouse.active && mouse.x !== null) {
+        nodes.forEach(n => {
+          const dx = n.x - mouse.x, dy = n.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_DIST) {
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = (1 - dist / MOUSE_DIST) * 0.55;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(mouse.x, mouse.y);
+            ctx.lineTo(n.x, n.y);
+            ctx.stroke();
+          }
+        });
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       ctx.globalAlpha = 0.9;
       ctx.fillStyle = color;
       nodes.forEach(n => {
@@ -381,6 +535,44 @@ document.addEventListener('DOMContentLoaded', function () {
       requestAnimationFrame(draw);
     }
     draw();
+
+    /* brighten the network while the hero is on screen */
+    const heroEl = document.getElementById('home');
+    if (heroEl) {
+      const heroIO = new IntersectionObserver((entries) => {
+        entries.forEach(entry => document.body.classList.toggle('in-hero', entry.isIntersecting));
+      }, { threshold: 0.35 });
+      heroIO.observe(heroEl);
+    }
+  }
+
+  /* ===================== mouse fx: cursor glow ===================== */
+  const cursorGlow = document.getElementById('cursor-glow');
+  if (cursorGlow && isFinePointer && !reduceMotion) {
+    (function loop() {
+      if (mouse.x !== null) {
+        cursorGlow.style.transform = `translate(${mouse.x}px, ${mouse.y}px) translate(-50%, -50%)`;
+        cursorGlow.classList.toggle('active', mouse.active);
+      }
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* ===================== mouse fx: magnetic buttons ===================== */
+  if (isFinePointer && !reduceMotion) {
+    const magneticEls = document.querySelectorAll('.btn, .icon-btn, .kbd-hint, .submit-btn, .skills-tab-btn, .copy-btn');
+    const PULL = 0.35, MAX_PULL = 14;
+    magneticEls.forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const relX = e.clientX - (rect.left + rect.width / 2);
+        const relY = e.clientY - (rect.top + rect.height / 2);
+        const dx = Math.max(-MAX_PULL, Math.min(MAX_PULL, relX * PULL));
+        const dy = Math.max(-MAX_PULL, Math.min(MAX_PULL, relY * PULL));
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+      el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+    });
   }
 
   /* ===================== GitHub live stats ===================== */

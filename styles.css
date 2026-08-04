@@ -201,8 +201,13 @@ section{ padding: 130px 0 90px; position:relative; }
   min-height: 100vh; display:flex; align-items:center; padding-top: var(--header-h);
   position:relative; overflow:hidden;
 }
-#net-canvas{ position:absolute; inset:0; z-index:0; opacity:.55; pointer-events:none; }
-[data-theme="light"] #net-canvas{ opacity:.25; }
+#net-canvas{
+  position:fixed; inset:0; width:100vw; height:100vh; z-index:0; pointer-events:none;
+  opacity:.4; transition: opacity .6s var(--ease);
+}
+[data-theme="light"] #net-canvas{ opacity:.16; }
+body.in-hero #net-canvas{ opacity:.7; }
+[data-theme="light"] body.in-hero #net-canvas{ opacity:.32; }
 
 .welcome .wrap{ position:relative; z-index:2; display:grid; grid-template-columns: 1.05fr .95fr; gap:56px; align-items:center; width:100%; }
 
@@ -527,4 +532,68 @@ footer{ border-top:1px solid var(--border); padding: 40px 0; }
   .info-grid{ grid-template-columns: 1fr; }
   .certificates-grid{ grid-template-columns: 1fr; }
   .editor-body{ font-size:.78rem; }
+}
+
+/* ============================================================
+   Live enhancements: mouse fx + boot sequence
+   ============================================================ */
+
+/* ---------------- mouse fx: cursor glow ---------------- */
+#cursor-glow{
+  position: fixed; top:0; left:0; width: 460px; height: 460px; z-index: 850;
+  pointer-events: none; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 70%);
+  mix-blend-mode: screen; will-change: transform, opacity;
+  transition: opacity .4s var(--ease);
+}
+[data-theme="light"] #cursor-glow{
+  mix-blend-mode: multiply;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 12%, transparent) 0%, transparent 70%);
+}
+#cursor-glow.active{ opacity: 1; }
+@media (hover: none), (pointer: coarse){ #cursor-glow{ display:none; } }
+
+/* ---------------- boot sequence ---------------- */
+#boot-screen{
+  position: fixed; inset:0; z-index: 5000;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--bg); cursor: pointer;
+  transition: opacity .55s var(--ease);
+}
+#boot-screen::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 65%);
+}
+#boot-screen.fade-out{ opacity:0; pointer-events:none; }
+.boot-box{
+  position:relative; width: min(560px, 88vw); font-family: var(--font-mono);
+  padding: 32px 30px; border:1px solid var(--border); border-radius: var(--radius-md);
+  background: var(--surface); box-shadow: var(--shadow-lg);
+}
+.boot-row{ font-size:.98rem; color: var(--text); display:flex; align-items:center; gap:2px; min-height: 1.4em; }
+.boot-prompt{ color: var(--accent); margin-right: 8px; }
+.boot-caret{ display:inline-block; width:8px; height:1.05em; background: var(--accent); margin-left:3px; animation: blink 1s steps(1) infinite; }
+.boot-tasks{ margin: 22px 0 6px; display:flex; flex-direction:column; gap:16px; }
+.boot-task{
+  opacity:0; transform: translateY(6px); transition: opacity .3s var(--ease), transform .3s var(--ease);
+  display:flex; flex-wrap:wrap; align-items:center; gap: 6px 10px;
+}
+.boot-task.show{ opacity:1; transform:none; }
+.boot-task-label{ flex: 0 0 100%; font-size:.82rem; color: var(--text-muted); display:flex; align-items:center; gap:9px; }
+.boot-task-label i{ color: var(--accent-2); width:14px; text-align:center; }
+.boot-bar{ flex: 1 1 auto; height:6px; border-radius:99px; background: var(--surface-2); overflow:hidden; }
+.boot-bar-fill{ display:block; height:100%; width:0%; border-radius:99px; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); transition: width .6s linear; }
+.boot-pct{ flex: 0 0 auto; min-width: 38px; text-align:right; font-size:.74rem; color: var(--text-faint); }
+.boot-welcome{
+  margin-top: 22px; font-family: var(--font-display); font-weight:700; font-size: 1.3rem;
+  color: var(--accent); opacity:0; transform: translateY(6px); transition: opacity .5s var(--ease), transform .5s var(--ease);
+}
+.boot-welcome.show{ opacity:1; transform:none; }
+.boot-skip{
+  position:absolute; bottom: 20px; right: 24px; font-family: var(--font-mono); font-size:.72rem;
+  color: var(--text-faint);
+}
+@media (max-width: 620px){
+  .boot-box{ padding: 24px 20px; }
+  .boot-skip{ right:16px; bottom:12px; font-size:.64rem; }
 }

@@ -1,13 +1,13 @@
 /* ============================================================
    Ayan.dev — AI Assistant
-   Self-contained chat widget: talks to Google's Gemini API
-   DIRECTLY from the browser (no proxy), renders markdown,
+   Self-contained chat widget: talks to OpenRouter's chat-completions
+   API DIRECTLY from the browser (no proxy), renders markdown,
    remembers the conversation for the session.
 
    WARNING: CONFIG.apiKey below ships inside this JS file and is
    readable by anyone who opens devtools on your site. Anyone can
-   copy it and use your Gemini quota/billing. Only keep it here if
-   this file truly never goes anywhere public (no GitHub, no
+   copy it and use your OpenRouter quota/billing. Only keep it here
+   if this file truly never goes anywhere public (no GitHub, no
    hosting, no sharing the folder). See cloudflare-worker.js if you
    ever want the safer, key-hidden setup back.
    ============================================================ */
@@ -17,10 +17,12 @@
 
   /* ===================== config ===================== */
   const CONFIG = {
-    // Your Gemini API key, used directly from the browser. Exposed to anyone
-    // who views page source / devtools — see warning above.
-    apiKey: 'AQ.Ab8RN6I74jaKqTngZw_FoKo5ijwgVt9DMDremZDH1sa19L2YpQ',
-    model: 'gemini-3.5-flash-lite', // актуальная быстрая/дешёвая модель на замену снятой gemini-2.5-flash
+    // Your OpenRouter API key, used directly from the browser. Exposed to
+    // anyone who views page source / devtools — see warning above.
+    // Get one at https://openrouter.ai/keys
+    apiKey: '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',
+    model: 'nvidia/nemotron-3-nano-30b-a3b:free', // бесплатная модель на OpenRouter
+    useReasoning: false, // nemotron умеет "думать" перед ответом — дольше, но точнее; включай при желании
     maxHistoryMessages: 16, // how many past turns are sent back to the model
   };
 
@@ -302,14 +304,16 @@
 
     const history = state.messages.slice(-CONFIG.maxHistoryMessages);
     const payload = {
-      systemInstruction: { parts: [{ text: window.buildAyanSystemPrompt() }] },
-      contents: history.map((m) => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      })),
+      model: CONFIG.model,
+      stream: true,
+      messages: [
+        { role: 'system', content: window.buildAyanSystemPrompt() },
+        ...history.map((m) => ({ role: m.role, content: m.content })),
+      ],
+      reasoning: { enabled: !!CONFIG.useReasoning },
     };
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.model}:streamGenerateContent?alt=sse`;
+    const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
 
     appendTypingIndicator();
 
@@ -323,7 +327,11 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': CONFIG.apiKey,
+          'Authorization': `Bearer ${CONFIG.apiKey}`,
+          // Recommended by OpenRouter for attribution / their leaderboard —
+          // harmless to keep, safe to remove.
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'Ayan.dev AI Assistant',
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
@@ -332,7 +340,7 @@
       if (!res.ok) {
         let detail = '';
         try { detail = await res.text(); } catch (e) { /* ignore */ }
-        throw new Error(`Gemini API responded ${res.status}: ${detail.slice(0, 500)}`);
+        throw new Error(`OpenRouter API responded ${res.status}: ${detail.slice(0, 500)}`);
       }
       if (!res.body) throw new Error('Response has no body (streaming not supported here)');
 
@@ -355,8 +363,9 @@
           if (!data || data === '[DONE]') continue;
           let parsed;
           try { parsed = JSON.parse(data); } catch (e) { continue; }
-          const parts = parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content && parsed.candidates[0].content.parts;
-          const chunkText = parts && parts.map((p) => p.text || '').join('');
+          const delta = parsed.choices && parsed.choices[0] && parsed.choices[0].delta;
+          // Skip reasoning tokens (delta.reasoning) — only stream the final answer.
+          const chunkText = delta && delta.content;
           if (!chunkText) continue;
 
           if (!bubble) {

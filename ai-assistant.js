@@ -173,12 +173,16 @@
   const state = {
     lang: getLang(),
     open: false,
+    mode: 'floating', // 'floating' (corner pill) | 'embedded' (hero ai.chat tab)
+    everOpened: false,
     messages: [], // { role: 'user' | 'assistant', content: string }
     loading: false,
   };
+  const reduceMotionLocal = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ===================== DOM building ===================== */
   let els = {};
+  let launcherTimeout;
 
   function buildWidget() {
     const t = UI_TEXT[state.lang];
@@ -186,7 +190,12 @@
     const launcher = document.createElement('button');
     launcher.id = 'ai-launcher';
     launcher.setAttribute('aria-label', t.title);
-    launcher.innerHTML = '<i class="fa-solid fa-comment-dots"></i><i class="fa-solid fa-xmark"></i><span class="ai-dot"></span>';
+    launcher.innerHTML = `
+      <span class="ai-launcher-prompt">&gt;</span>
+      <span class="ai-launcher-text" id="ai-launcher-text"></span>
+      <span class="ai-launcher-caret"></span>
+      <i class="fa-solid fa-xmark ai-launcher-close-icon"></i>
+    `;
 
     const panel = document.createElement('div');
     panel.id = 'ai-panel';
@@ -213,6 +222,7 @@
     els = {
       launcher,
       panel,
+      launcherText: launcher.querySelector('#ai-launcher-text'),
       messages: panel.querySelector('#ai-messages'),
       suggestions: panel.querySelector('#ai-suggestions'),
       input: panel.querySelector('#ai-input'),
@@ -222,7 +232,106 @@
 
     renderWelcome();
     wireEvents();
+    wireEditorTabs();
+    startLauncherTyping();
+
+    // Draw the eye once, a couple seconds in — only if nobody has
+    // interacted with the assistant yet and motion isn't disabled.
+    if (!reduceMotionLocal) {
+      setTimeout(() => {
+        if (state.everOpened || state.mode === 'embedded') return;
+        els.launcher.classList.add('attention');
+        setTimeout(() => els.launcher.classList.remove('attention'), 3000);
+      }, 2800);
+    }
   }
+
+  /* ===================== launcher: rotating typed prompt ===================== */
+  function startLauncherTyping() {
+    clearTimeout(launcherTimeout);
+    const t = UI_TEXT[state.lang];
+    const phrases = t.suggestions;
+    if (!els.launcherText) return;
+    if (reduceMotionLocal) { els.launcherText.textContent = phrases[0]; return; }
+    let pi = 0, ci = 0, deleting = false;
+    function tick() {
+      if (state.mode === 'embedded') return; // pill is hidden while embedded
+      const word = phrases[pi];
+      if (!deleting) {
+        ci++;
+        els.launcherText.textContent = word.slice(0, ci);
+        if (ci === word.length) { deleting = true; launcherTimeout = setTimeout(tick, 1800); return; }
+        launcherTimeout = setTimeout(tick, 45);
+      } else {
+        ci--;
+        els.launcherText.textContent = word.slice(0, ci);
+        if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+        launcherTimeout = setTimeout(tick, 28);
+      }
+    }
+    tick();
+  }
+  function stopLauncherTyping() { clearTimeout(launcherTimeout); }
+
+  /* ===================== mount targets: floating pill vs. hero tab ===================== */
+  function ensureFloating() {
+    if (els.panel.parentElement !== document.body) document.body.appendChild(els.panel);
+    els.panel.classList.remove('ai-panel-embedded');
+    els.launcher.classList.remove('is-hidden');
+    if (state.mode !== 'floating') {
+      state.mode = 'floating';
+      startLauncherTyping();
+    }
+  }
+
+  function ensureEmbedded(slotEl) {
+    if (!slotEl) return;
+    if (els.panel.parentElement !== slotEl) slotEl.appendChild(els.panel);
+    els.panel.classList.add('ai-panel-embedded');
+    els.panel.classList.remove('open');
+    state.open = false;
+    els.launcher.classList.add('is-hidden');
+    els.launcher.classList.remove('attention');
+    if (state.mode !== 'embedded') {
+      state.mode = 'embedded';
+      state.everOpened = true;
+      stopLauncherTyping();
+    }
+    setTimeout(() => els.input && els.input.focus(), 220);
+  }
+
+  function wireEditorTabs() {
+    const aiTab = document.querySelector('#editor-tabs span[data-tab="ai"]');
+    const otherTabs = document.querySelectorAll('#editor-tabs span[data-tab]:not([data-tab="ai"])');
+    const editorWindow = document.querySelector('.editor-window');
+    const embedSlot = document.getElementById('ai-embed-slot');
+    if (!aiTab || !editorWindow || !embedSlot) return;
+
+    aiTab.addEventListener('click', () => {
+      document.querySelectorAll('#editor-tabs span[data-tab]').forEach((t) => t.classList.remove('active'));
+      aiTab.classList.add('active');
+      editorWindow.classList.add('ai-active');
+      ensureEmbedded(embedSlot);
+    });
+    otherTabs.forEach((tabEl) => {
+      tabEl.addEventListener('click', () => {
+        editorWindow.classList.remove('ai-active');
+        if (state.mode === 'embedded') ensureFloating(); // stays closed, just moves back to the corner
+      });
+    });
+  }
+
+  /* Single entry point for every "open the assistant" trigger — the
+     corner pill and the command palette both call this. */
+  window.openAyanAI = function () {
+    if (state.mode === 'embedded') {
+      els.panel.scrollIntoView({ behavior: reduceMotionLocal ? 'auto' : 'smooth', block: 'center' });
+      setTimeout(() => els.input && els.input.focus(), reduceMotionLocal ? 0 : 320);
+      return;
+    }
+    ensureFloating();
+    openPanel();
+  };
 
   function renderWelcome() {
     const t = UI_TEXT[state.lang];
@@ -419,8 +528,10 @@
 
   function openPanel() {
     state.open = true;
+    state.everOpened = true;
     els.panel.classList.add('open');
     els.launcher.classList.add('open');
+    els.launcher.classList.remove('attention');
     setTimeout(() => els.input.focus(), 260);
   }
 
@@ -432,7 +543,14 @@
 
   function wireEvents() {
     els.launcher.addEventListener('click', () => (state.open ? closePanel() : openPanel()));
-    els.close.addEventListener('click', closePanel);
+    els.close.addEventListener('click', () => {
+      if (state.mode === 'embedded') {
+        const aboutTab = document.querySelector('#editor-tabs span[data-tab="about"]');
+        if (aboutTab) aboutTab.click();
+      } else {
+        closePanel();
+      }
+    });
     els.send.addEventListener('click', sendMessage);
     els.input.addEventListener('input', autosizeInput);
     els.input.addEventListener('keydown', (e) => {

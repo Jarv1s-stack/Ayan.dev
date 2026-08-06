@@ -55,7 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
       toast_copied: 'Email copied to clipboard',
       toast_easter: 'Achievement unlocked: curious mind \u{1F3AE}',
       cmdk_placeholder: 'Type a command or search…',
-      cmdk_nav: 'Navigate', cmdk_actions: 'Actions', cmdk_empty: 'No results found.',
+      cmdk_ai_group: 'Assistant', cmdk_nav: 'Navigate', cmdk_actions: 'Actions', cmdk_empty: 'No results found.',
+      cmd_ai: 'Ask AI about Ayan',
       cmd_home: 'Go to Home', cmd_about: 'Go to About', cmd_skills: 'Go to Skills', cmd_journey: 'Go to Journey', cmd_contact: 'Go to Contact',
       cmd_theme: 'Toggle light / dark theme', cmd_lang: 'Switch language (EN / RU)', cmd_copy: 'Copy email address',
       cmd_gh: 'Open GitHub profile', cmd_li: 'Open LinkedIn profile', cmd_tg: 'Open Telegram',
@@ -95,7 +96,8 @@ document.addEventListener('DOMContentLoaded', function () {
       toast_copied: 'Email скопирован',
       toast_easter: 'Достижение получено: любопытный ум \u{1F3AE}',
       cmdk_placeholder: 'Введите команду или запрос…',
-      cmdk_nav: 'Навигация', cmdk_actions: 'Действия', cmdk_empty: 'Ничего не найдено.',
+      cmdk_ai_group: 'Ассистент', cmdk_nav: 'Навигация', cmdk_actions: 'Действия', cmdk_empty: 'Ничего не найдено.',
+      cmd_ai: 'Спросить AI об Ayan',
       cmd_home: 'Перейти на Главную', cmd_about: 'Перейти в Обо мне', cmd_skills: 'Перейти в Навыки', cmd_journey: 'Перейти в Путь', cmd_contact: 'Перейти в Контакты',
       cmd_theme: 'Переключить тему', cmd_lang: 'Сменить язык (EN / RU)', cmd_copy: 'Скопировать email',
       cmd_gh: 'Открыть GitHub', cmd_li: 'Открыть LinkedIn', cmd_tg: 'Открыть Telegram',
@@ -391,20 +393,43 @@ document.addEventListener('DOMContentLoaded', function () {
   restartRoleTyping();
 
   /* ===================== hero: editor code typing ===================== */
-  const codeLines = [
-    'const developer = {',
-    '  name: "Ayan Abdimutalip",',
-    '  role: "Frontend & AI Developer",',
-    '  location: "Almaty, KZ",',
-    '  stack: ["React", "JS", "AI APIs"],',
-    '  status: "available",',
-    '  hireable: true',
-    '};',
-    '',
-    '// let\'s build something great'
-  ];
-  const fullCode = codeLines.join('\n');
+  const codeSnippets = {
+    about: [
+      'const developer = {',
+      '  name: "Ayan Abdimutalip",',
+      '  role: "Frontend & AI Developer",',
+      '  location: "Almaty, KZ",',
+      '  stack: ["React", "JS", "AI APIs"],',
+      '  status: "available",',
+      '  hireable: true',
+      '};',
+      '',
+      '// let\'s build something great'
+    ],
+    skills: [
+      'const skills = {',
+      '  frontend: ["React", "JS", "TS", "CSS"],',
+      '  ai: ["Prompt Eng", "LLM APIs", "RAG"],',
+      '  design: ["Figma", "Illustrator"],',
+      '  learning: true',
+      '};',
+      '',
+      '// scroll to Skills for the full breakdown'
+    ],
+    contact: [
+      'const contact = {',
+      '  email: "ayanabdimutalip@gmail.com",',
+      '  telegram: "@ayanabdimutalip",',
+      '  location: "Almaty, KZ",',
+      '  replyTime: "usually same day"',
+      '};',
+      '',
+      '// say hello — see the Contact section'
+    ]
+  };
+  let currentCodeLines = codeSnippets.about;
   const typeTarget = document.getElementById('type-target');
+  let typeTimeout;
 
   function highlight(raw) {
     let html = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -415,7 +440,10 @@ document.addEventListener('DOMContentLoaded', function () {
     return html;
   }
 
-  function typeCode() {
+  function typeCode(lines) {
+    currentCodeLines = lines || currentCodeLines;
+    const fullCode = currentCodeLines.join('\n');
+    clearTimeout(typeTimeout);
     if (reduceMotion) {
       typeTarget.innerHTML = highlight(fullCode);
       return;
@@ -431,14 +459,27 @@ document.addEventListener('DOMContentLoaded', function () {
       if (i < fullCode.length) {
         const c = fullCode[i - 1];
         const delay = c === '\n' ? 90 : (Math.random() * 18 + 10);
-        setTimeout(step, delay);
+        typeTimeout = setTimeout(step, delay);
       } else {
-        setTimeout(() => { typeTarget.innerHTML = highlight(fullCode); }, 300);
+        typeTimeout = setTimeout(() => { typeTarget.innerHTML = highlight(fullCode); }, 300);
       }
     }
     step();
   }
-  typeCode();
+  typeCode(codeSnippets.about);
+
+  /* editor tabs: about.js / skills.json / contact.md swap the typed code.
+     The 4th tab (ai.chat) is handled by ai-assistant.js — it owns the
+     "active" class there too, since it needs to also toggle the embedded
+     chat panel in lockstep. Here we just react to the 3 "code" tabs. */
+  document.querySelectorAll('#editor-tabs span[data-tab]').forEach((tabEl) => {
+    tabEl.addEventListener('click', () => {
+      if (tabEl.dataset.tab === 'ai') return;
+      document.querySelectorAll('#editor-tabs span[data-tab]').forEach((t) => t.classList.remove('active'));
+      tabEl.classList.add('active');
+      typeCode(codeSnippets[tabEl.dataset.tab] || codeSnippets.about);
+    });
+  });
 
   /* ===================== sitewide live background: network canvas ===================== */
   const canvas = document.getElementById('net-canvas');
@@ -682,6 +723,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function buildCommandList() {
     const t = translations[currentLang];
     cmdItems = [
+      { group: t.cmdk_ai_group, icon: 'fa-sparkles', label: t.cmd_ai, run: () => window.openAyanAI && window.openAyanAI() },
       { group: t.cmdk_nav, icon: 'fa-house', label: t.cmd_home, run: () => scrollToId('home') },
       { group: t.cmdk_nav, icon: 'fa-user', label: t.cmd_about, run: () => scrollToId('about') },
       { group: t.cmdk_nav, icon: 'fa-code', label: t.cmd_skills, run: () => scrollToId('skills') },

@@ -6,20 +6,46 @@
 
 #ai-launcher{
   position: fixed; right: 24px; bottom: 24px; z-index: 1200;
-  width: 58px; height: 58px; border-radius: 50%; border: 1px solid var(--border);
-  background: var(--surface); color: var(--accent); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; gap: 8px;
+  height: 46px; padding: 0 18px 0 16px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-family: var(--font-mono); font-size: .82rem; cursor: pointer; white-space: nowrap;
   box-shadow: var(--shadow-lg);
-  transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease), opacity .25s var(--ease);
 }
-#ai-launcher:hover{ transform: translateY(-3px); background: var(--surface-2); }
-#ai-launcher i{ font-size: 1.35rem; }
-#ai-launcher .ai-dot{
-  position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--success); border: 2px solid var(--surface);
+#ai-launcher::before{
+  content:''; position: absolute; inset: -3px; z-index: -1; border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-blue), var(--accent-3), var(--accent));
+  background-size: 300% 300%; opacity: .5; filter: blur(7px);
+  animation: aiGlowShift 6s ease-in-out infinite;
 }
-#ai-launcher.open i.fa-comment-dots{ display:none; }
-#ai-launcher:not(.open) i.fa-xmark{ display:none; }
+@keyframes aiGlowShift{ 0%,100%{ background-position: 0% 50%; } 50%{ background-position: 100% 50%; } }
+#ai-launcher:hover{ transform: translateY(-3px); border-color: var(--accent); }
+#ai-launcher.is-hidden{ opacity: 0; pointer-events: none; transform: translateY(14px) scale(.92); }
+
+#ai-launcher .ai-launcher-prompt{ color: var(--accent); font-weight: 700; }
+#ai-launcher .ai-launcher-text{ color: var(--text-muted); max-width: 200px; overflow: hidden; }
+#ai-launcher .ai-launcher-caret{
+  display: inline-block; width: 6px; height: 1em; background: var(--accent-2);
+  vertical-align: -2px; animation: blink .9s steps(1) infinite;
+}
+#ai-launcher .ai-launcher-close-icon{ display: none; font-size: .95rem; }
+#ai-launcher.open .ai-launcher-prompt,
+#ai-launcher.open .ai-launcher-text,
+#ai-launcher.open .ai-launcher-caret{ display: none; }
+#ai-launcher.open .ai-launcher-close-icon{ display: inline-block; }
+
+@keyframes aiAttentionPulse{
+  0%{ box-shadow: var(--shadow-lg), 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  70%{ box-shadow: var(--shadow-lg), 0 0 0 16px transparent; }
+  100%{ box-shadow: var(--shadow-lg), 0 0 0 0 transparent; }
+}
+#ai-launcher.attention{ animation: aiAttentionPulse 1.4s var(--ease) 2; }
+@media (prefers-reduced-motion: reduce){
+  #ai-launcher::before{ animation: none; }
+  #ai-launcher .ai-launcher-caret{ animation: none; }
+  #ai-launcher.attention{ animation: none; }
+}
 
 #ai-panel{
   position: fixed; right: 24px; bottom: 94px; z-index: 1199;
@@ -133,5 +159,48 @@
   #ai-panel{
     right: 12px; left: 12px; bottom: 88px; width: auto; height: min(70vh, 640px);
   }
-  #ai-launcher{ right: 16px; bottom: 16px; }
+  #ai-launcher{ right: 16px; bottom: 16px; padding: 0 14px; }
+  #ai-launcher .ai-launcher-text{ max-width: 120px; }
+}
+
+/* ============================================================
+   ai.chat — the AI lives inside the hero "editor window" as a
+   4th, real tab. Clicking it moves the SAME #ai-panel node into
+   the editor body (no duplicate chat instance, no lost history).
+   ============================================================ */
+.editor-tabs span.tab-ai{
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  transition: color .2s var(--ease), background .2s var(--ease);
+}
+.editor-tabs span.tab-ai:hover{ color: var(--text); }
+.editor-tabs span.tab-ai i{ font-size: .78rem; }
+.editor-tabs span.tab-ai .tab-ai-dot{
+  width: 6px; height: 6px; border-radius: 50%; background: var(--success); position: relative; flex-shrink: 0;
+}
+.editor-tabs span.tab-ai .tab-ai-dot::after{
+  content:''; position: absolute; inset: -3px; border-radius: 50%; background: var(--success);
+  opacity: .5; animation: pulse-ring 1.8s ease-out infinite;
+}
+.editor-tabs span:not(.tab-ai){ cursor: pointer; }
+
+.editor-window.ai-active{ transform: none; }
+.editor-window.ai-active:hover{ transform: none; }
+.editor-window.ai-active .editor-body{ padding: 0; height: 460px; min-height: 460px; }
+.editor-window.ai-active .line-numbers,
+.editor-window.ai-active .code-content{ display: none; }
+
+.ai-embed-slot{ display: none; flex: 1; min-height: 0; }
+.editor-window.ai-active .ai-embed-slot{ display: flex; }
+
+#ai-panel.ai-panel-embedded{
+  position: static; inset: auto; width: 100%; height: 100%; min-height: 460px;
+  border: none; border-radius: 0; box-shadow: none; background: transparent;
+  opacity: 1; transform: none; pointer-events: auto;
+}
+#ai-panel.ai-panel-embedded .ai-header{ background: var(--surface); }
+#ai-panel.ai-panel-embedded .ai-input-row{ background: var(--surface); }
+
+@media (max-width: 620px){
+  .editor-window.ai-active .editor-body{ height: 400px; min-height: 400px; }
+  #ai-panel.ai-panel-embedded{ min-height: 400px; }
 }

@@ -74,15 +74,17 @@
     <div class="editor-window">
       <div class="editor-titlebar">
         <div class="traffic"><span></span><span></span><span></span></div>
-        <div class="editor-tabs">
-          <span class="active">about.js</span>
-          <span>skills.json</span>
-          <span>contact.md</span>
+        <div class="editor-tabs" id="editor-tabs">
+          <span class="tab-ai" data-tab="ai"><i class="fa-solid fa-robot"></i>ai.chat<span class="tab-ai-dot"></span></span>
+          <span class="active" data-tab="about">about.js</span>
+          <span data-tab="skills">skills.json</span>
+          <span data-tab="contact">contact.md</span>
         </div>
       </div>
-      <div class="editor-body">
+      <div class="editor-body" id="editor-body">
         <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
         <div class="code-content"><span id="type-target"></span></div>
+        <div class="ai-embed-slot" id="ai-embed-slot"></div>
       </div>
     </div>
   </div>

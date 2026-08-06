@@ -18,18 +18,18 @@ window.AYAN_KNOWLEDGE = {
   },
 
   skills: [
-    'React', 'Vite', 'JavaScript', 'TypeScript', 'HTML5', 'CSS3',
-    'Responsive Design', 'Framer Motion', 'Three.js', 'React Three Fiber',
+    'React', 'Vite', 'JavaScript', 'HTML5', 'CSS3',
+    'Responsive Design', 'Framer Motion', 'React Three Fiber',
     'Node.js', 'Express.js', 'REST API design', 'PostgreSQL', 'MongoDB',
-    'Git & GitHub', 'Figma', 'CorelDRAW', 'Adobe Photoshop',
+    'Git & GitHub', 'Figma', 'CorelDRAW', 'Adobe Photoshop', 'Adobe illustrator',
     'AI integration', 'LLM & Prompt Engineering', 'Local AI models (Ollama)',
   ],
 
   technologies: {
-    frontend: ['React', 'Vite', 'JavaScript (ES6+)', 'TypeScript', 'HTML5', 'CSS3', 'Framer Motion', 'Three.js / React Three Fiber'],
+    frontend: ['React', 'Vite', 'JavaScript (ES6+)', 'HTML5', 'CSS3', 'Framer Motion'],
     backend: ['Node.js', 'Express.js', 'REST APIs'],
     databases: ['PostgreSQL', 'MongoDB'],
-    design: ['Figma', 'CorelDRAW', 'Adobe Photoshop'],
+    design: ['Figma', 'CorelDRAW', 'Adobe Photoshop', 'Adobe illustrator'],
     ai: ['LLM integration', 'Prompt engineering', 'Local models via Ollama', 'AI chatbot / assistant development'],
     tooling: ['Git', 'GitHub'],
   },
@@ -44,6 +44,7 @@ window.AYAN_KNOWLEDGE = {
     {
       name: 'Event Platform',
       description: 'A full-stack web application for creating and managing events end-to-end.',
+
     },
     {
       name: 'Telegram bots',
@@ -58,6 +59,17 @@ window.AYAN_KNOWLEDGE = {
     {
       name: 'Ayan.dev — this portfolio',
       description: 'This very site: a hand-built "developer console" themed portfolio with a command palette, live network background, and now this AI assistant.',
+      link: 'https://jarv1s-stack.github.io/Ayan.dev/'
+    },
+    {
+      name: 'Game-Helth',
+      description: 'Game health monitoring platform with AI insights, player analytics, and performance optimization',
+      link: 'https://game-helth.vercel.app/'
+    },
+    {
+      name: 'Indrive-AI',
+      description: 'AI-powered inDrive assistant automating ride management, smart booking, route optimization, and driver support.',
+      link: 'https://github.com/Jarv1s-stack/Indrive-AI'
     },
   ],
 
@@ -106,9 +118,10 @@ window.AYAN_KNOWLEDGE = {
 
   contacts: {
     github: 'https://github.com/ayanabdimutalip',
-    linkedin: 'https://www.linkedin.com/in/ayan-abdimutalip-5a5b5a2b5/',
+    gmail: 'ayanabdimutalip@gmail.com',
     telegram: 'https://t.me/ayanabdimutalip',
     phone: '+7 700 344 2997',
+    WhatsApp: 'https://wa.me/77052130076',
     location: 'Almaty, Kazakhstan',
   },
 
@@ -163,7 +176,6 @@ ${fmtFaq(k.faq)}
 
 CONTACTS
 GitHub: ${k.contacts.github}
-LinkedIn: ${k.contacts.linkedin}
 Telegram: ${k.contacts.telegram}
 Phone: ${k.contacts.phone}
 

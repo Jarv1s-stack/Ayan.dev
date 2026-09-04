@@ -7,7 +7,6 @@
 <meta name="description" content="Portfolio of Ayan Abdimutalip — Frontend & ChatBot/AI developer based in Almaty, Kazakhstan.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="ai-assistant.css">
 <link rel="icon" href="ghibli-photo.png" type="image/png">
 </head>
 <body data-theme="dark">
@@ -34,7 +33,9 @@
     <a href="#about" data-i18n="nav_about"><span class="idx">02</span>About</a>
     <a href="#skills" data-i18n="nav_skills"><span class="idx">03</span>Skills</a>
     <a href="#resume" data-i18n="nav_resume"><span class="idx">04</span>Journey</a>
-    <a href="#contact" data-i18n="nav_contact"><span class="idx">05</span>Contact</a>
+    <a href="#projects" data-i18n="nav_projects"><span class="idx">05</span>Projects</a>
+    <a href="#fluctlight" data-i18n="nav_fluctlight"><span class="idx">06</span>Fluctlight AI</a>
+    <a href="#contact" data-i18n="nav_contact"><span class="idx">07</span>Contact</a>
   </nav>
 
   <div class="header-actions">
@@ -75,7 +76,6 @@
       <div class="editor-titlebar">
         <div class="traffic"><span></span><span></span><span></span></div>
         <div class="editor-tabs" id="editor-tabs">
-          <span class="tab-ai" data-tab="ai"><i class="fa-solid fa-robot"></i>ai.chat<span class="tab-ai-dot"></span></span>
           <span class="active" data-tab="about">about.js</span>
           <span data-tab="skills">skills.json</span>
           <span data-tab="contact">contact.md</span>
@@ -84,7 +84,6 @@
       <div class="editor-body" id="editor-body">
         <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
         <div class="code-content"><span id="type-target"></span></div>
-        <div class="ai-embed-slot" id="ai-embed-slot"></div>
       </div>
     </div>
   </div>
@@ -221,6 +220,26 @@
   </div>
 </section>
 
+<!-- ================= PROJECTS ================= -->
+<section id="projects" class="projects-section">
+  <div class="wrap">
+    <div class="section-header reveal"><div class="eyebrow" data-i18n="projects_eyebrow">Selected work</div><h2 data-i18n="projects_title">Projects</h2><p data-i18n="projects_desc">A selection of things I have built — from AI systems and full-stack products to polished interfaces.</p></div>
+    <div class="projects-grid reveal-stagger">
+      <article class="project-card project-card--featured"><div class="project-card__top"><span class="project-index">01</span><span class="project-status" data-i18n="project_live">Live experiment</span></div><div class="project-icon"><i class="fa-solid fa-atom"></i></div><h3 data-i18n="project_fluctlight_title">Fluctlight AI</h3><p data-i18n="project_fluctlight_desc">My personal AI with a living 3D light-field interface, voice input and voice replies. Ask it to understand who I am and what I can build.</p><div class="project-tags"><span>AI</span><span>Three.js</span><span>Voice</span></div><a href="https://jarv1s-stack.github.io/Fluctflight-AI/" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a></article>
+      <article class="project-card"><div class="project-card__top"><span class="project-index">02</span><span class="project-status">Portfolio</span></div><div class="project-icon"><i class="fa-solid fa-terminal"></i></div><h3>Ayan.dev</h3><p data-i18n="project_ayan_desc">A hand-built developer portfolio with a console-inspired interface, motion, certificates and a clear way to start a conversation.</p><div class="project-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div><a href="https://jarv1s-stack.github.io/Ayan.dev/" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a></article>
+      <article class="project-card"><div class="project-card__top"><span class="project-index">03</span><span class="project-status">AI product</span></div><div class="project-icon"><i class="fa-solid fa-car-side"></i></div><h3>Indrive-AI</h3><p data-i18n="project_indrive_desc">An AI-powered inDrive assistant for ride management, smart booking, route optimization and driver support.</p><div class="project-tags"><span>AI</span><span>Automation</span></div><a href="https://github.com/Jarv1s-stack/Indrive-AI" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_source">View source</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a></article>
+      <article class="project-card"><div class="project-card__top"><span class="project-index">04</span><span class="project-status">Web app</span></div><div class="project-icon"><i class="fa-solid fa-heart-pulse"></i></div><h3>Game-Helth</h3><p data-i18n="project_game_desc">A game health monitoring platform with AI insights, player analytics and performance optimization.</p><div class="project-tags"><span>Dashboard</span><span>Analytics</span></div><a href="https://game-helth.vercel.app/" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a></article>
+      <article class="project-card"><div class="project-card__top"><span class="project-index">05</span><span class="project-status">Desktop AI</span></div><div class="project-icon"><i class="fa-solid fa-microchip"></i></div><h3>Jarvis</h3><p data-i18n="project_jarvis_desc">A local, offline-first Windows assistant with voice control, file handling and automation through local AI models.</p><div class="project-tags"><span>Local AI</span><span>Automation</span></div></article>
+      <article class="project-card"><div class="project-card__top"><span class="project-index">06</span><span class="project-status">Full stack</span></div><div class="project-icon"><i class="fa-solid fa-calendar-days"></i></div><h3 data-i18n="project_event_title">Event Platform</h3><p data-i18n="project_event_desc">A full-stack web application for creating and managing events end-to-end.</p><div class="project-tags"><span>Full stack</span><span>Web app</span></div></article>
+      <article class="project-card"><div class="project-card__top"><span class="project-index">07</span><span class="project-status">Bots</span></div><div class="project-icon"><i class="fa-brands fa-telegram"></i></div><h3 data-i18n="project_bots_title">Telegram bots</h3><p data-i18n="project_bots_desc">Useful Telegram bots, including a Kazakh-language ticket-summary bot with numbered inline actions.</p><div class="project-tags"><span>Telegram</span><span>Automation</span></div></article>
+      <article class="project-card"><div class="project-card__top"><span class="project-index">08</span><span class="project-status">UI / UX</span></div><div class="project-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div><h3 data-i18n="project_landing_title">Landing pages</h3><p data-i18n="project_landing_desc">Custom animated landing pages built from scratch — no page-builder templates.</p><div class="project-tags"><span>Design</span><span>Motion</span></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FLUCTLIGHT AI ================= -->
+<section id="fluctlight" class="fluctlight-section"><div class="wrap"><div class="section-header reveal"><div class="eyebrow" data-i18n="fluctlight_eyebrow">My personal AI</div><h2 data-i18n="fluctlight_title">Meet Fluctlight AI</h2><p data-i18n="fluctlight_desc">This is my AI — a living interface that helps you understand who I am, what I build and whether I am the right person for your project.</p></div><div class="fluctlight-frame reveal"><iframe src="https://jarv1s-stack.github.io/Fluctflight-AI/" title="Fluctlight AI — Ayan's personal AI assistant" loading="lazy" allow="microphone"></iframe></div><div class="fluctlight-actions reveal"><span data-i18n="fluctlight_hint">Ask about my skills, projects, services or collaboration.</span><a href="https://jarv1s-stack.github.io/Fluctflight-AI/" target="_blank" rel="noopener" class="btn outline"><i class="fa-solid fa-arrow-up-right-from-square"></i><span data-i18n="fluctlight_open">Open full experience</span></a></div></div></section>
+
 <!-- ================= CONTACT ================= -->
 <section id="contact" class="contact-section">
   <div class="wrap">
@@ -317,7 +336,5 @@
 <div id="toast-stack"></div>
 
 <script src="script.js"></script>
-<script src="ai-knowledge.js"></script>
-<script src="ai-assistant.js"></script>
 </body>
 </html>

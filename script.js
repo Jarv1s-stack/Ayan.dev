@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ===================== i18n ===================== */
   const translations = {
     en: {
-      nav_home: 'Home', nav_about: 'About', nav_skills: 'Skills', nav_resume: 'Journey', nav_contact: 'Contact',
+      nav_home: 'Home', nav_about: 'About', nav_skills: 'Skills', nav_resume: 'Journey', nav_projects: 'Projects', nav_fluctlight: 'Fluctlight AI', nav_contact: 'Contact',
       cmdk_hint: 'Quick nav',
       hero_avail: 'Open to opportunities',
       welcome_hello: "Hello, I'm",
@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
       about_fullname: 'Fullname', about_dob: 'Date of birth', about_address: 'Address', about_telegram: 'Telegram',
       about_stats: 'Projects complete', about_certs: 'Certificates earned', about_tools: 'Design tools',
       about_download_cv: 'Download CV', about_my_projects: 'My Projects',
+      projects_eyebrow: 'Selected work', projects_title: 'Projects', projects_desc: 'A selection of things I have built — from AI systems and full-stack products to polished interfaces.',
+      project_live: 'Live experiment', project_open: 'Open project', project_source: 'View source', project_fluctlight_title: 'Fluctlight AI', project_fluctlight_desc: 'My personal AI with a living 3D light-field interface, voice input and voice replies. Ask it to understand who I am and what I can build.', project_ayan_desc: 'A hand-built developer portfolio with a console-inspired interface, motion, certificates and a clear way to start a conversation.', project_indrive_desc: 'An AI-powered inDrive assistant for ride management, smart booking, route optimization and driver support.', project_game_desc: 'A game health monitoring platform with AI insights, player analytics and performance optimization.', project_jarvis_desc: 'A local, offline-first Windows assistant with voice control, file handling and automation through local AI models.', project_event_title: 'Event Platform', project_event_desc: 'A full-stack web application for creating and managing events end-to-end.', project_bots_title: 'Telegram bots', project_bots_desc: 'Useful Telegram bots, including a Kazakh-language ticket-summary bot with numbered inline actions.', project_landing_title: 'Landing pages', project_landing_desc: 'Custom animated landing pages built from scratch — no page-builder templates.', fluctlight_eyebrow: 'My personal AI', fluctlight_title: 'Meet Fluctlight AI', fluctlight_desc: 'This is my AI — a living interface that helps you understand who I am, what I build and whether I am the right person for your project.', fluctlight_hint: 'Ask about my skills, projects, services or collaboration.', fluctlight_open: 'Open full experience',
       skills_eyebrow: 'Capabilities', skills_title: 'My Skills',
       skills_desc: 'I have expertise in various web technologies and design tools that help me build modern, polished web applications from concept to code.',
       skills_tab_dev: 'Development', skills_tab_design: 'Design Tools', skill_chatbot: 'ChatBot Development',
@@ -55,17 +57,16 @@ document.addEventListener('DOMContentLoaded', function () {
       toast_copied: 'Email copied to clipboard',
       toast_easter: 'Achievement unlocked: curious mind \u{1F3AE}',
       cmdk_placeholder: 'Type a command or search…',
-      cmdk_ai_group: 'Assistant', cmdk_nav: 'Navigate', cmdk_actions: 'Actions', cmdk_empty: 'No results found.',
-      cmd_ai: 'Ask AI about Ayan',
-      cmd_home: 'Go to Home', cmd_about: 'Go to About', cmd_skills: 'Go to Skills', cmd_journey: 'Go to Journey', cmd_contact: 'Go to Contact',
+      cmdk_nav: 'Navigate', cmdk_actions: 'Actions', cmdk_empty: 'No results found.',
+      cmd_home: 'Go to Home', cmd_about: 'Go to About', cmd_skills: 'Go to Skills', cmd_journey: 'Go to Journey', cmd_projects: 'Go to Projects', cmd_fluctlight: 'Go to Fluctlight AI', cmd_contact: 'Go to Contact',
       cmd_theme: 'Toggle light / dark theme', cmd_lang: 'Switch language (EN / RU)', cmd_copy: 'Copy email address',
       cmd_gh: 'Open GitHub profile', cmd_li: 'Open LinkedIn profile', cmd_tg: 'Open Telegram',
       boot_title: 'Booting Ayan.dev...',
-      boot_task_projects: 'Loading Projects', boot_task_ai: 'Loading AI Systems', boot_task_creativity: 'Loading Creativity',
+      boot_task_projects: 'Loading Projects', boot_task_ai: 'Loading Fluctlight AI', boot_task_creativity: 'Loading Creativity',
       boot_welcome: 'Welcome, Human.', boot_skip: 'press any key to skip'
     },
     ru: {
-      nav_home: 'Главная', nav_about: 'Обо мне', nav_skills: 'Навыки', nav_resume: 'Путь', nav_contact: 'Контакты',
+      nav_home: 'Главная', nav_about: 'Обо мне', nav_skills: 'Навыки', nav_resume: 'Путь', nav_projects: 'Проекты', nav_fluctlight: 'Fluctlight AI', nav_contact: 'Контакты',
       cmdk_hint: 'Навигация',
       hero_avail: 'Открыт для предложений',
       welcome_hello: 'Привет, я',
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
       about_fullname: 'Полное имя', about_dob: 'Дата рождения', about_address: 'Адрес', about_telegram: 'Телеграм',
       about_stats: 'Завершено проектов', about_certs: 'Получено сертификатов', about_tools: 'Инструменты дизайна',
       about_download_cv: 'Скачать резюме', about_my_projects: 'Мои проекты',
+      projects_eyebrow: 'Избранные работы', projects_title: 'Проекты', projects_desc: 'Подборка моих работ — от AI-систем и full-stack продуктов до продуманных интерфейсов.', project_live: 'Живой эксперимент', project_open: 'Открыть проект', project_source: 'Открыть исходник', project_fluctlight_title: 'Fluctlight AI', project_fluctlight_desc: 'Мой персональный ИИ с живым 3D-интерфейсом светового поля, голосовым вводом и ответами. Спросите его, кто я и что умею создавать.', project_ayan_desc: 'Авторское портфолио разработчика в стиле консоли: анимации, сертификаты и понятный путь к сотрудничеству.', project_indrive_desc: 'AI-помощник для inDrive: управление поездками, умное бронирование, оптимизация маршрутов и поддержка водителей.', project_game_desc: 'Платформа мониторинга здоровья игр с AI-инсайтами, аналитикой игроков и оптимизацией производительности.', project_jarvis_desc: 'Локальный офлайн-помощник для Windows с голосовым управлением, файлами и автоматизацией на локальных AI-моделях.', project_event_title: 'Event Platform', project_event_desc: 'Full-stack приложение для создания и управления мероприятиями от начала до конца.', project_bots_title: 'Telegram-боты', project_bots_desc: 'Полезные Telegram-боты, включая бота для сводки тикетов на казахском языке с кнопками действий.', project_landing_title: 'Landing pages', project_landing_desc: 'Кастомные анимированные лендинги, созданные с нуля — без шаблонов конструкторов.', fluctlight_eyebrow: 'Мой персональный ИИ', fluctlight_title: 'Познакомьтесь с Fluctlight AI', fluctlight_desc: 'Это мой ИИ — живая система, которая поможет понять, кто я, что создаю и подхожу ли я для вашего проекта.', fluctlight_hint: 'Спросите о моих навыках, проектах, услугах или сотрудничестве.', fluctlight_open: 'Открыть полностью',
       skills_eyebrow: 'Возможности', skills_title: 'Мои навыки',
       skills_desc: 'У меня есть опыт в различных веб-технологиях и инструментах дизайна, которые помогают создавать современные приложения от идеи до кода.',
       skills_tab_dev: 'Разработка', skills_tab_design: 'Дизайн', skill_chatbot: 'Разработка чат-ботов',
@@ -96,13 +98,12 @@ document.addEventListener('DOMContentLoaded', function () {
       toast_copied: 'Email скопирован',
       toast_easter: 'Достижение получено: любопытный ум \u{1F3AE}',
       cmdk_placeholder: 'Введите команду или запрос…',
-      cmdk_ai_group: 'Ассистент', cmdk_nav: 'Навигация', cmdk_actions: 'Действия', cmdk_empty: 'Ничего не найдено.',
-      cmd_ai: 'Спросить AI об Ayan',
-      cmd_home: 'Перейти на Главную', cmd_about: 'Перейти в Обо мне', cmd_skills: 'Перейти в Навыки', cmd_journey: 'Перейти в Путь', cmd_contact: 'Перейти в Контакты',
+      cmdk_nav: 'Навигация', cmdk_actions: 'Действия', cmdk_empty: 'Ничего не найдено.',
+      cmd_home: 'Перейти на Главную', cmd_about: 'Перейти в Обо мне', cmd_skills: 'Перейти в Навыки', cmd_journey: 'Перейти в Путь', cmd_projects: 'Перейти в Проекты', cmd_fluctlight: 'Перейти в Fluctlight AI', cmd_contact: 'Перейти в Контакты',
       cmd_theme: 'Переключить тему', cmd_lang: 'Сменить язык (EN / RU)', cmd_copy: 'Скопировать email',
       cmd_gh: 'Открыть GitHub', cmd_li: 'Открыть LinkedIn', cmd_tg: 'Открыть Telegram',
       boot_title: 'Загрузка Ayan.dev...',
-      boot_task_projects: 'Загрузка проектов', boot_task_ai: 'Загрузка AI-систем', boot_task_creativity: 'Загрузка креативности',
+      boot_task_projects: 'Загрузка проектов', boot_task_ai: 'Загрузка Fluctlight AI', boot_task_creativity: 'Загрузка креативности',
       boot_welcome: 'Добро пожаловать, Человек.', boot_skip: 'нажмите любую клавишу, чтобы пропустить'
     }
   };
@@ -723,11 +724,12 @@ document.addEventListener('DOMContentLoaded', function () {
   function buildCommandList() {
     const t = translations[currentLang];
     cmdItems = [
-      { group: t.cmdk_ai_group, icon: 'fa-sparkles', label: t.cmd_ai, run: () => window.openAyanAI && window.openAyanAI() },
       { group: t.cmdk_nav, icon: 'fa-house', label: t.cmd_home, run: () => scrollToId('home') },
       { group: t.cmdk_nav, icon: 'fa-user', label: t.cmd_about, run: () => scrollToId('about') },
       { group: t.cmdk_nav, icon: 'fa-code', label: t.cmd_skills, run: () => scrollToId('skills') },
       { group: t.cmdk_nav, icon: 'fa-code-branch', label: t.cmd_journey, run: () => scrollToId('resume') },
+      { group: t.cmdk_nav, icon: 'fa-folder-open', label: t.cmd_projects, run: () => scrollToId('projects') },
+      { group: t.cmdk_nav, icon: 'fa-atom', label: t.cmd_fluctlight, run: () => scrollToId('fluctlight') },
       { group: t.cmdk_nav, icon: 'fa-envelope', label: t.cmd_contact, run: () => scrollToId('contact') },
       { group: t.cmdk_actions, icon: 'fa-circle-half-stroke', label: t.cmd_theme, run: toggleTheme },
       { group: t.cmdk_actions, icon: 'fa-language', label: t.cmd_lang, run: () => setLang(currentLang === 'en' ? 'ru' : 'en') },

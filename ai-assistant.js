@@ -21,7 +21,7 @@
     // anyone who views page source / devtools — see warning above.
     // Get one at https://openrouter.ai/keys
     apiKey: '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',
-    model: 'nvidia/nemotron-3-nano-30b-a3b:free', // бесплатная модель на OpenRouter
+    model: 'openrouter/free', // бесплатная модель на OpenRouter
     useReasoning: false, // nemotron умеет "думать" перед ответом — дольше, но точнее; включай при желании
     maxHistoryMessages: 16, // how many past turns are sent back to the model
   };

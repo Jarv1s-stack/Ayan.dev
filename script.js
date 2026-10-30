@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ===================== i18n ===================== */
   const translations = {
     en: {
-      nav_home: 'Home', nav_about: 'About', nav_skills: 'Skills', nav_resume: 'Journey', nav_projects: 'Projects', nav_fluctlight: 'Fluctlight AI', nav_contact: 'Contact',
+      nav_home: 'Home', nav_about: 'About', nav_skills: 'Skills', nav_resume: 'Journey', nav_projects: 'Projects', nav_contact: 'Contact',
       cmdk_hint: 'Quick nav',
       hero_avail: 'Open to opportunities',
       welcome_hello: "Hello, I'm",
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
       about_stats: 'Projects complete', about_certs: 'Certificates earned', about_tools: 'Design tools',
       about_download_cv: 'Download CV', about_my_projects: 'My Projects',
       projects_eyebrow: 'Selected work', projects_title: 'Projects', projects_desc: 'A selection of things I have built — from AI systems and full-stack products to polished interfaces.',
-      project_live: 'Live experiment', project_open: 'Open project', project_source: 'View source', project_fluctlight_title: 'Fluctlight AI', project_fluctlight_desc: 'My personal AI with a living 3D light-field interface, voice input and voice replies. Ask it to understand who I am and what I can build.', project_ayan_desc: 'A hand-built developer portfolio with a console-inspired interface, motion, certificates and a clear way to start a conversation.', project_indrive_desc: 'An AI-powered inDrive assistant for ride management, smart booking, route optimization and driver support.', project_game_desc: 'A game health monitoring platform with AI insights, player analytics and performance optimization.', project_jarvis_desc: 'A local, offline-first Windows assistant with voice control, file handling and automation through local AI models.', project_event_title: 'Event Platform', project_event_desc: 'A full-stack web application for creating and managing events end-to-end.', project_bots_title: 'Telegram bots', project_bots_desc: 'Useful Telegram bots, including a Kazakh-language ticket-summary bot with numbered inline actions.', project_landing_title: 'Landing pages', project_landing_desc: 'Custom animated landing pages built from scratch — no page-builder templates.', fluctlight_eyebrow: 'My personal AI', fluctlight_title: 'Meet Fluctlight AI', fluctlight_desc: 'This is my AI — a living interface that helps you understand who I am, what I build and whether I am the right person for your project.', fluctlight_hint: 'Ask about my skills, projects, services or collaboration.', fluctlight_open: 'Open full experience',
+      project_search_label: 'Search projects', project_search_placeholder: 'Find a project, tool or technology…', project_filter_label: 'Project filters', project_filter_all: 'All', project_filter_web: 'Web', project_filter_ai: 'AI', project_filter_automation: 'Automation', project_saved_only: 'Saved', project_save: 'Save project', project_remove: 'Remove from saved', projects_showing: 'Showing', projects_of: 'of', projects_count_label: 'projects', projects_empty: 'Nothing matches these filters. Try a different search.', toast_project_saved: 'Project saved', toast_project_removed: 'Project removed from saved', project_open: 'Open project', project_source: 'View source', project_ayan_desc: 'A hand-built developer portfolio with a console-inspired interface, motion, certificates and a clear way to start a conversation.', project_indrive_desc: 'An AI-powered inDrive assistant for ride management, smart booking, route optimization and driver support.', project_game_desc: 'A game health monitoring platform with AI insights, player analytics and performance optimization.', project_jarvis_desc: 'A local, offline-first Windows assistant with voice control, file handling and automation through local AI models.', project_event_title: 'Event Platform', project_event_desc: 'A full-stack web application for creating and managing events end-to-end.', project_bots_title: 'Telegram bots', project_bots_desc: 'Useful Telegram bots, including a Kazakh-language ticket-summary bot with numbered inline actions.', project_landing_title: 'Landing pages', project_landing_desc: 'Custom animated landing pages built from scratch — no page-builder templates.',
       skills_eyebrow: 'Capabilities', skills_title: 'My Skills',
       skills_desc: 'I have expertise in various web technologies and design tools that help me build modern, polished web applications from concept to code.',
       skills_tab_dev: 'Development', skills_tab_design: 'Design Tools', skill_chatbot: 'ChatBot Development',
@@ -58,15 +58,15 @@ document.addEventListener('DOMContentLoaded', function () {
       toast_easter: 'Achievement unlocked: curious mind \u{1F3AE}',
       cmdk_placeholder: 'Type a command or search…',
       cmdk_nav: 'Navigate', cmdk_actions: 'Actions', cmdk_empty: 'No results found.',
-      cmd_home: 'Go to Home', cmd_about: 'Go to About', cmd_skills: 'Go to Skills', cmd_journey: 'Go to Journey', cmd_projects: 'Go to Projects', cmd_fluctlight: 'Go to Fluctlight AI', cmd_contact: 'Go to Contact',
+      cmd_home: 'Go to Home', cmd_about: 'Go to About', cmd_skills: 'Go to Skills', cmd_journey: 'Go to Journey', cmd_projects: 'Go to Projects', cmd_contact: 'Go to Contact',
       cmd_theme: 'Toggle light / dark theme', cmd_lang: 'Switch language (EN / RU)', cmd_copy: 'Copy email address',
       cmd_gh: 'Open GitHub profile', cmd_li: 'Open LinkedIn profile', cmd_tg: 'Open Telegram',
       boot_title: 'Booting Ayan.dev...',
-      boot_task_projects: 'Loading Projects', boot_task_ai: 'Loading Fluctlight AI', boot_task_creativity: 'Loading Creativity',
+      boot_task_projects: 'Loading Projects', boot_task_motion: 'Loading motion', boot_task_creativity: 'Loading Creativity',
       boot_welcome: 'Welcome, Human.', boot_skip: 'press any key to skip'
     },
     ru: {
-      nav_home: 'Главная', nav_about: 'Обо мне', nav_skills: 'Навыки', nav_resume: 'Путь', nav_projects: 'Проекты', nav_fluctlight: 'Fluctlight AI', nav_contact: 'Контакты',
+      nav_home: 'Главная', nav_about: 'Обо мне', nav_skills: 'Навыки', nav_resume: 'Путь', nav_projects: 'Проекты', nav_contact: 'Контакты',
       cmdk_hint: 'Навигация',
       hero_avail: 'Открыт для предложений',
       welcome_hello: 'Привет, я',
@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', function () {
       about_fullname: 'Полное имя', about_dob: 'Дата рождения', about_address: 'Адрес', about_telegram: 'Телеграм',
       about_stats: 'Завершено проектов', about_certs: 'Получено сертификатов', about_tools: 'Инструменты дизайна',
       about_download_cv: 'Скачать резюме', about_my_projects: 'Мои проекты',
-      projects_eyebrow: 'Избранные работы', projects_title: 'Проекты', projects_desc: 'Подборка моих работ — от AI-систем и full-stack продуктов до продуманных интерфейсов.', project_live: 'Живой эксперимент', project_open: 'Открыть проект', project_source: 'Открыть исходник', project_fluctlight_title: 'Fluctlight AI', project_fluctlight_desc: 'Мой персональный ИИ с живым 3D-интерфейсом светового поля, голосовым вводом и ответами. Спросите его, кто я и что умею создавать.', project_ayan_desc: 'Авторское портфолио разработчика в стиле консоли: анимации, сертификаты и понятный путь к сотрудничеству.', project_indrive_desc: 'AI-помощник для inDrive: управление поездками, умное бронирование, оптимизация маршрутов и поддержка водителей.', project_game_desc: 'Платформа мониторинга здоровья игр с AI-инсайтами, аналитикой игроков и оптимизацией производительности.', project_jarvis_desc: 'Локальный офлайн-помощник для Windows с голосовым управлением, файлами и автоматизацией на локальных AI-моделях.', project_event_title: 'Event Platform', project_event_desc: 'Full-stack приложение для создания и управления мероприятиями от начала до конца.', project_bots_title: 'Telegram-боты', project_bots_desc: 'Полезные Telegram-боты, включая бота для сводки тикетов на казахском языке с кнопками действий.', project_landing_title: 'Landing pages', project_landing_desc: 'Кастомные анимированные лендинги, созданные с нуля — без шаблонов конструкторов.', fluctlight_eyebrow: 'Мой персональный ИИ', fluctlight_title: 'Познакомьтесь с Fluctlight AI', fluctlight_desc: 'Это мой ИИ — живая система, которая поможет понять, кто я, что создаю и подхожу ли я для вашего проекта.', fluctlight_hint: 'Спросите о моих навыках, проектах, услугах или сотрудничестве.', fluctlight_open: 'Открыть полностью',
+      projects_eyebrow: 'Избранные работы', projects_title: 'Проекты', projects_desc: 'Подборка моих работ — от AI-систем и full-stack продуктов до продуманных интерфейсов.',
+      project_search_label: 'Поиск проектов', project_search_placeholder: 'Название, инструмент или технология…', project_filter_label: 'Фильтры проектов', project_filter_all: 'Все', project_filter_web: 'Веб', project_filter_ai: 'AI', project_filter_automation: 'Автоматизация', project_saved_only: 'Избранное', project_save: 'Сохранить проект', project_remove: 'Убрать из избранного', projects_showing: 'Показано', projects_of: 'из', projects_count_label: 'проектов', projects_empty: 'По этим фильтрам ничего не найдено. Попробуйте изменить запрос.', toast_project_saved: 'Проект сохранён', toast_project_removed: 'Проект убран из избранного', project_open: 'Открыть проект', project_source: 'Открыть исходник', project_ayan_desc: 'Авторское портфолио разработчика в стиле консоли: анимации, сертификаты и понятный путь к сотрудничеству.', project_indrive_desc: 'AI-помощник для inDrive: управление поездками, умное бронирование, оптимизация маршрутов и поддержка водителей.', project_game_desc: 'Платформа мониторинга здоровья игр с AI-инсайтами, аналитикой игроков и оптимизацией производительности.', project_jarvis_desc: 'Локальный офлайн-помощник для Windows с голосовым управлением, файлами и автоматизацией на локальных AI-моделях.', project_event_title: 'Event Platform', project_event_desc: 'Full-stack приложение для создания и управления мероприятиями от начала до конца.', project_bots_title: 'Telegram-боты', project_bots_desc: 'Полезные Telegram-боты, включая бота для сводки тикетов на казахском языке с кнопками действий.', project_landing_title: 'Landing pages', project_landing_desc: 'Кастомные анимированные лендинги, созданные с нуля — без шаблонов конструкторов.',
       skills_eyebrow: 'Возможности', skills_title: 'Мои навыки',
       skills_desc: 'У меня есть опыт в различных веб-технологиях и инструментах дизайна, которые помогают создавать современные приложения от идеи до кода.',
       skills_tab_dev: 'Разработка', skills_tab_design: 'Дизайн', skill_chatbot: 'Разработка чат-ботов',
@@ -99,11 +100,11 @@ document.addEventListener('DOMContentLoaded', function () {
       toast_easter: 'Достижение получено: любопытный ум \u{1F3AE}',
       cmdk_placeholder: 'Введите команду или запрос…',
       cmdk_nav: 'Навигация', cmdk_actions: 'Действия', cmdk_empty: 'Ничего не найдено.',
-      cmd_home: 'Перейти на Главную', cmd_about: 'Перейти в Обо мне', cmd_skills: 'Перейти в Навыки', cmd_journey: 'Перейти в Путь', cmd_projects: 'Перейти в Проекты', cmd_fluctlight: 'Перейти в Fluctlight AI', cmd_contact: 'Перейти в Контакты',
+      cmd_home: 'Перейти на Главную', cmd_about: 'Перейти в Обо мне', cmd_skills: 'Перейти в Навыки', cmd_journey: 'Перейти в Путь', cmd_projects: 'Перейти в Проекты', cmd_contact: 'Перейти в Контакты',
       cmd_theme: 'Переключить тему', cmd_lang: 'Сменить язык (EN / RU)', cmd_copy: 'Скопировать email',
       cmd_gh: 'Открыть GitHub', cmd_li: 'Открыть LinkedIn', cmd_tg: 'Открыть Telegram',
       boot_title: 'Загрузка Ayan.dev...',
-      boot_task_projects: 'Загрузка проектов', boot_task_ai: 'Загрузка Fluctlight AI', boot_task_creativity: 'Загрузка креативности',
+      boot_task_projects: 'Загрузка проектов', boot_task_motion: 'Загрузка анимации', boot_task_creativity: 'Загрузка креативности',
       boot_welcome: 'Добро пожаловать, Человек.', boot_skip: 'нажмите любую клавишу, чтобы пропустить'
     }
   };
@@ -118,6 +119,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const key = el.getAttribute('data-i18n');
       if (dict[key] !== undefined) el.innerHTML = dict[key];
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (dict[key] !== undefined) el.setAttribute('placeholder', dict[key]);
+    });
     document.documentElement.setAttribute('lang', lang);
   }
 
@@ -126,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
     safeSet('localStorage', 'lang', lang);
     langToggle.value = lang;
     applyTranslations(lang);
+    updateProjectExplorer({ animate: false });
     restartRoleTyping();
     buildCommandList();
   }
@@ -170,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const tasks = [
       { label: t.boot_task_projects, icon: 'fa-folder-tree' },
-      { label: t.boot_task_ai, icon: 'fa-brain' },
+      { label: t.boot_task_motion, icon: 'fa-wand-magic-sparkles' },
       { label: t.boot_task_creativity, icon: 'fa-wand-magic-sparkles' }
     ];
     tasksEl.innerHTML = tasks.map(task =>
@@ -666,6 +672,150 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   window.showToast = showToast;
 
+  /* ===================== project finder + saved projects ===================== */
+  const projectsGrid = document.getElementById('projects-grid');
+  const projectCards = [...projectsGrid.querySelectorAll('.project-card')];
+  const projectSearch = document.getElementById('project-search');
+  const projectFilterButtons = [...document.querySelectorAll('[data-project-filter]')];
+  const showSavedButton = document.getElementById('show-saved-projects');
+  const visibleProjectCount = document.getElementById('projects-visible-count');
+  const totalProjectCount = document.getElementById('projects-total-count');
+  const savedProjectCount = document.getElementById('saved-count');
+  const projectsEmpty = document.getElementById('projects-empty');
+  const projectFilterGroup = document.querySelector('.project-filter-row[role="group"]');
+  const savedProjectIds = new Set();
+  const knownProjectIds = new Set(projectCards.map(card => card.dataset.projectId));
+  let activeProjectFilter = 'all';
+  let showSavedOnly = false;
+  const normalizeProjectSearch = value => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+
+  try {
+    const storedProjects = JSON.parse(safeGet('localStorage', 'savedProjects') || '[]');
+    if (Array.isArray(storedProjects)) {
+      storedProjects.forEach(id => { if (knownProjectIds.has(id)) savedProjectIds.add(id); });
+    }
+  } catch (e) { /* ignore a damaged saved-project list */ }
+
+  function updateProjectExplorer({ animate = false } = {}) {
+    const t = translations[currentLang];
+    const query = normalizeProjectSearch(projectSearch.value.trim());
+    let visible = 0;
+
+    projectSearch.setAttribute('aria-label', t.project_search_label);
+    projectFilterGroup.setAttribute('aria-label', t.project_filter_label);
+    showSavedButton.setAttribute('aria-label', t.project_saved_only);
+    showSavedButton.setAttribute('aria-pressed', String(showSavedOnly));
+    showSavedButton.querySelector('i').className = `fa-${showSavedOnly ? 'solid' : 'regular'} fa-bookmark`;
+    savedProjectCount.textContent = savedProjectIds.size;
+    totalProjectCount.textContent = projectCards.length;
+
+    projectCards.forEach(card => {
+      const id = card.dataset.projectId;
+      const saved = savedProjectIds.has(id);
+      const saveButton = card.querySelector('[data-project-save]');
+      const saveLabel = t[saved ? 'project_remove' : 'project_save'];
+      const projectTitle = card.querySelector('h3').textContent.trim();
+      const accessibleSaveLabel = `${saveLabel}: ${projectTitle}`;
+
+      saveButton.setAttribute('aria-label', accessibleSaveLabel);
+      saveButton.setAttribute('title', accessibleSaveLabel);
+      saveButton.setAttribute('aria-pressed', String(saved));
+      saveButton.querySelector('.sr-only').textContent = saveLabel;
+      saveButton.querySelector('i').className = `fa-${saved ? 'solid' : 'regular'} fa-bookmark`;
+
+      const searchText = normalizeProjectSearch([...card.querySelectorAll('h3, p, .project-status, .project-tags span')]
+        .map(element => element.textContent).join(' '));
+      const matchesSearch = !query || searchText.includes(query);
+      const matchesCategory = activeProjectFilter === 'all' || card.dataset.category.split(' ').includes(activeProjectFilter);
+      const matchesSaved = !showSavedOnly || saved;
+      const matches = matchesSearch && matchesCategory && matchesSaved;
+      const wasHidden = card.hidden;
+      card.hidden = !matches;
+      if (matches) {
+        visible++;
+        if (wasHidden && animate && !reduceMotion && typeof card.animate === 'function') {
+          card.animate([
+            { opacity: 0, transform: 'translateY(18px) scale(.98)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+          ], { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)' });
+        }
+      }
+    });
+
+    visibleProjectCount.textContent = visible;
+    projectsEmpty.hidden = visible > 0;
+    projectFilterButtons.forEach(button => {
+      const selected = button.dataset.projectFilter === activeProjectFilter;
+      button.classList.toggle('active', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+  }
+
+  projectSearch.addEventListener('input', () => updateProjectExplorer({ animate: true }));
+  projectFilterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      activeProjectFilter = button.dataset.projectFilter;
+      updateProjectExplorer({ animate: true });
+    });
+  });
+  showSavedButton.addEventListener('click', () => {
+    showSavedOnly = !showSavedOnly;
+    updateProjectExplorer({ animate: true });
+  });
+  projectCards.forEach(card => {
+    card.querySelector('[data-project-save]').addEventListener('click', () => {
+      const id = card.dataset.projectId;
+      const nowSaved = !savedProjectIds.has(id);
+      if (nowSaved) savedProjectIds.add(id);
+      else savedProjectIds.delete(id);
+      safeSet('localStorage', 'savedProjects', JSON.stringify([...savedProjectIds]));
+      updateProjectExplorer({ animate: true });
+      showToast(translations[currentLang][nowSaved ? 'toast_project_saved' : 'toast_project_removed']);
+    });
+
+    if (isFinePointer && !reduceMotion) {
+      card.addEventListener('pointermove', event => {
+        const rect = card.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        card.style.setProperty('--pointer-x', `${x * 100}%`);
+        card.style.setProperty('--pointer-y', `${y * 100}%`);
+        card.style.setProperty('--card-rotate-y', `${(x - .5) * 7}deg`);
+        card.style.setProperty('--card-rotate-x', `${(.5 - y) * 6}deg`);
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--card-rotate-x', '0deg');
+        card.style.setProperty('--card-rotate-y', '0deg');
+      });
+    }
+  });
+  document.addEventListener('keydown', event => {
+    const isEditing = event.target.matches('input, textarea, select, [contenteditable="true"]');
+    if (event.key === '/' && !isEditing && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      event.preventDefault();
+      projectSearch.focus();
+    }
+    if (event.key === 'Escape' && event.target === projectSearch && projectSearch.value) {
+      projectSearch.value = '';
+      updateProjectExplorer({ animate: true });
+    }
+  });
+  const editorWindow = document.querySelector('.editor-window');
+  if (editorWindow && isFinePointer && !reduceMotion) {
+    editorWindow.addEventListener('pointermove', event => {
+      const rect = editorWindow.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      editorWindow.style.setProperty('--editor-rotate-y', `${-4 + (x - .5) * 9}deg`);
+      editorWindow.style.setProperty('--editor-rotate-x', `${1 + (.5 - y) * 7}deg`);
+    });
+    editorWindow.addEventListener('pointerleave', () => {
+      editorWindow.style.setProperty('--editor-rotate-y', '-4deg');
+      editorWindow.style.setProperty('--editor-rotate-x', '1deg');
+    });
+  }
+  updateProjectExplorer();
+
   /* ===================== certificate modal ===================== */
   const certData = [
     { id: 'Advanced-React', title: 'Advanced React' },
@@ -729,7 +879,6 @@ document.addEventListener('DOMContentLoaded', function () {
       { group: t.cmdk_nav, icon: 'fa-code', label: t.cmd_skills, run: () => scrollToId('skills') },
       { group: t.cmdk_nav, icon: 'fa-code-branch', label: t.cmd_journey, run: () => scrollToId('resume') },
       { group: t.cmdk_nav, icon: 'fa-folder-open', label: t.cmd_projects, run: () => scrollToId('projects') },
-      { group: t.cmdk_nav, icon: 'fa-atom', label: t.cmd_fluctlight, run: () => scrollToId('fluctlight') },
       { group: t.cmdk_nav, icon: 'fa-envelope', label: t.cmd_contact, run: () => scrollToId('contact') },
       { group: t.cmdk_actions, icon: 'fa-circle-half-stroke', label: t.cmd_theme, run: toggleTheme },
       { group: t.cmdk_actions, icon: 'fa-language', label: t.cmd_lang, run: () => setLang(currentLang === 'en' ? 'ru' : 'en') },

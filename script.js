@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const hasGSAP = Boolean(window.gsap && window.ScrollTrigger);
 
   /* ===================== crash-safe storage (private mode / sandboxed frames) ===================== */
   const memStore = {};
@@ -157,12 +158,16 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ===================== boot sequence ===================== */
   (function initBoot() {
     const bootScreen = document.getElementById('boot-screen');
-    if (!bootScreen) return;
+    if (!bootScreen) {
+      window.setTimeout(() => window.dispatchEvent(new Event('portfolio:boot-complete')), 0);
+      return;
+    }
 
     const alreadyPlayed = safeGet('sessionStorage', 'bootPlayed') === '1';
     if (alreadyPlayed || reduceMotion) {
       safeSet('sessionStorage', 'bootPlayed', '1');
       bootScreen.remove();
+      window.setTimeout(() => window.dispatchEvent(new Event('portfolio:boot-complete')), 0);
       return;
     }
 
@@ -238,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.body.style.overflow = '';
       safeSet('sessionStorage', 'bootPlayed', '1');
       bootScreen.remove();
+      window.dispatchEvent(new Event('portfolio:boot-complete'));
     }
     runBoot();
   })();
@@ -288,6 +294,84 @@ document.addEventListener('DOMContentLoaded', function () {
   const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
   if (reduceMotion) {
     revealEls.forEach(el => el.classList.add('in'));
+  } else if (hasGSAP) {
+    const { gsap, ScrollTrigger } = window;
+    gsap.registerPlugin(ScrollTrigger);
+    const motionMedia = gsap.matchMedia();
+    motionMedia.add({
+      all: 'all',
+      reduced: '(prefers-reduced-motion: reduce)',
+      finePointer: '(hover: hover) and (pointer: fine)'
+    }, context => {
+      const { reduced, finePointer } = context.conditions;
+      if (reduced) {
+        revealEls.forEach(el => el.classList.add('in'));
+        return;
+      }
+
+      document.documentElement.classList.add('gsap-ready');
+      const playHeroIntro = () => {
+        const intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
+        intro.fromTo('.hero-copy .avail', { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: .72 })
+          .fromTo('.hero-copy .hello', { autoAlpha: 0, x: -18 }, { autoAlpha: 1, x: 0, duration: .56 }, '-=.42')
+          .fromTo('.hero-copy h1', { autoAlpha: 0, y: 30, rotationX: 8, transformPerspective: 900 }, { autoAlpha: 1, y: 0, rotationX: 0, duration: .78 }, '-=.34')
+          .fromTo('#typed-role', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .55 }, '-=.4')
+          .fromTo('.hero-copy .buttons .btn', { autoAlpha: 0, y: 18, scale: .96 }, { autoAlpha: 1, y: 0, scale: 1, duration: .48, stagger: .1 }, '-=.25')
+          .fromTo('.hero-meta', { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .5 }, '-=.24')
+          .fromTo('.editor-window', { autoAlpha: 0, y: 38, rotationY: -10, rotationX: 5 }, {
+            autoAlpha: 1, y: -6, rotationY: -4, rotationX: 1, duration: 1.05,
+            onComplete: () => gsap.to('.editor-window', { y: -12, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true })
+          }, '-=.56');
+      };
+      window.addEventListener('portfolio:boot-complete', playHeroIntro, { once: true });
+
+      gsap.to('.hero-ambient--violet', { x: 36, y: 28, scale: 1.12, duration: 8.5, ease: 'sine.inOut', repeat: -1, yoyo: true });
+      gsap.to('.hero-ambient--cyan', { x: -26, y: -34, scale: 1.16, duration: 7.2, ease: 'sine.inOut', repeat: -1, yoyo: true });
+
+      revealEls.forEach(el => {
+        const staggered = el.classList.contains('reveal-stagger');
+        const targets = staggered ? [...el.children] : el;
+        gsap.fromTo(targets,
+          { autoAlpha: 0, y: staggered ? 30 : 36, rotationX: staggered ? 4 : 2, transformPerspective: 1000, filter: 'blur(5px)' },
+          {
+            autoAlpha: 1, y: 0, rotationX: 0, filter: 'blur(0px)', duration: staggered ? .78 : .88,
+            stagger: staggered ? .085 : 0, ease: 'power3.out',
+            scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+            onComplete: () => el.classList.add('in')
+          }
+        );
+      });
+
+      if (finePointer) {
+        const editor = document.querySelector('.editor-window');
+        if (editor) {
+          const rotateXTo = gsap.quickTo(editor, 'rotationX', { duration: .6, ease: 'power3.out' });
+          const rotateYTo = gsap.quickTo(editor, 'rotationY', { duration: .6, ease: 'power3.out' });
+          editor.addEventListener('pointermove', event => {
+            const rect = editor.getBoundingClientRect();
+            rotateYTo(-4 + ((event.clientX - rect.left) / rect.width - .5) * 9);
+            rotateXTo(1 + (.5 - (event.clientY - rect.top) / rect.height) * 7);
+          });
+          editor.addEventListener('pointerleave', () => { rotateYTo(-4); rotateXTo(1); });
+        }
+
+        document.querySelectorAll('.project-card').forEach(card => {
+          gsap.set(card, { transformPerspective: 1100, transformOrigin: '50% 50%' });
+          const rotateXTo = gsap.quickTo(card, 'rotationX', { duration: .46, ease: 'power3.out' });
+          const rotateYTo = gsap.quickTo(card, 'rotationY', { duration: .46, ease: 'power3.out' });
+          card.addEventListener('pointermove', event => {
+            const rect = card.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / rect.width;
+            const y = (event.clientY - rect.top) / rect.height;
+            card.style.setProperty('--pointer-x', `${x * 100}%`);
+            card.style.setProperty('--pointer-y', `${y * 100}%`);
+            rotateYTo((x - .5) * 7);
+            rotateXTo((.5 - y) * 6);
+          });
+          card.addEventListener('pointerleave', () => { rotateXTo(0); rotateYTo(0); });
+        });
+      }
+    });
   } else {
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -733,7 +817,12 @@ document.addEventListener('DOMContentLoaded', function () {
       card.hidden = !matches;
       if (matches) {
         visible++;
-        if (wasHidden && animate && !reduceMotion && typeof card.animate === 'function') {
+        if (wasHidden && animate && !reduceMotion && hasGSAP && projectsGrid.classList.contains('in')) {
+          window.gsap.fromTo(card,
+            { autoAlpha: 0, y: 20, scale: .96, rotationX: 5 },
+            { autoAlpha: 1, y: 0, scale: 1, rotationX: 0, duration: .62, ease: 'power3.out', overwrite: 'auto', clearProps: 'opacity,visibility,transform' }
+          );
+        } else if (wasHidden && animate && !reduceMotion && !hasGSAP && typeof card.animate === 'function') {
           card.animate([
             { opacity: 0, transform: 'translateY(18px) scale(.98)' },
             { opacity: 1, transform: 'translateY(0) scale(1)' }
@@ -773,7 +862,7 @@ document.addEventListener('DOMContentLoaded', function () {
       showToast(translations[currentLang][nowSaved ? 'toast_project_saved' : 'toast_project_removed']);
     });
 
-    if (isFinePointer && !reduceMotion) {
+    if (isFinePointer && !reduceMotion && !hasGSAP) {
       card.addEventListener('pointermove', event => {
         const rect = card.getBoundingClientRect();
         const x = (event.clientX - rect.left) / rect.width;
@@ -801,7 +890,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
   const editorWindow = document.querySelector('.editor-window');
-  if (editorWindow && isFinePointer && !reduceMotion) {
+  if (editorWindow && isFinePointer && !reduceMotion && !hasGSAP) {
     editorWindow.addEventListener('pointermove', event => {
       const rect = editorWindow.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width;

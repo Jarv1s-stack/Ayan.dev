@@ -23,6 +23,7 @@
   --accent-2: #ffb454;      /* keyword amber */
   --accent-3: #ff6b9d;      /* tag pink */
   --accent-blue: #6aa1ff;   /* function blue */
+  --accent-violet: #a38bff;
   --success: #4ade80;
 
   --font-display: 'Sora', 'Inter', sans-serif;
@@ -57,6 +58,7 @@
   --accent-2: #b5730c;
   --accent-3: #d1467a;
   --accent-blue: #2f5fd6;
+  --accent-violet: #715bd6;
   --success: #1a9c53;
 
   --shadow-md: 0 10px 30px -14px rgba(20,25,40,.18);
@@ -80,6 +82,13 @@ body{
   transition: background .35s var(--ease), color .35s var(--ease);
   overflow-x: hidden;
 }
+body::before{ content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.36;
+  background:radial-gradient(ellipse at 82% 9%,color-mix(in srgb,var(--accent-violet) 18%,transparent),transparent 31%),
+             radial-gradient(ellipse at 8% 46%,color-mix(in srgb,var(--accent-blue) 9%,transparent),transparent 36%),
+             linear-gradient(color-mix(in srgb,var(--text) 2.5%,transparent) 1px,transparent 1px),
+             linear-gradient(90deg,color-mix(in srgb,var(--text) 2.5%,transparent) 1px,transparent 1px);
+  background-size:auto,auto,48px 48px,48px 48px; mask-image:linear-gradient(to bottom,#000 0%,transparent 82%); }
+[data-theme="light"] body::before{ opacity:.2; }
 
 ::selection{ background: var(--accent); color: #051b17; }
 
@@ -195,12 +204,17 @@ section{ padding: 130px 0 90px; position:relative; }
 .reveal-stagger.in > *:nth-child(7){ transition-delay:.39s; }
 .reveal-stagger.in > *:nth-child(8){ transition-delay:.45s; }
 .reveal-stagger.in > *:nth-child(9){ transition-delay:.51s; }
+html.gsap-ready .reveal,html.gsap-ready .reveal-stagger > *{ transition:none; }
+html.gsap-ready .project-card{ transition:border-color .28s var(--ease),box-shadow .28s var(--ease); }
 
 /* ---------------- hero ---------------- */
 .welcome{
   min-height: 100vh; display:flex; align-items:center; padding-top: var(--header-h);
-  position:relative; overflow:hidden;
+  position:relative; overflow:hidden; isolation:isolate;
 }
+.hero-ambient{ position:absolute; z-index:1; pointer-events:none; border-radius:50%; filter:blur(2px); will-change:transform; }
+.hero-ambient--violet{ width:min(66vw,760px); aspect-ratio:1; top:-38%; right:-19%; opacity:.3; background:radial-gradient(circle at 48% 48%,color-mix(in srgb,var(--accent-violet) 75%,transparent),color-mix(in srgb,var(--accent-blue) 24%,transparent) 38%,transparent 72%); }
+.hero-ambient--cyan{ width:min(48vw,560px); aspect-ratio:1; bottom:-48%; left:-23%; opacity:.2; background:radial-gradient(circle at 52% 48%,color-mix(in srgb,var(--accent) 72%,transparent),color-mix(in srgb,var(--accent-blue) 24%,transparent) 42%,transparent 72%); }
 #net-canvas{
   position:fixed; inset:0; width:100vw; height:100vh; z-index:0; pointer-events:none;
   opacity:.4; transition: opacity .6s var(--ease);
@@ -259,6 +273,7 @@ body.in-hero #net-canvas{ opacity:.7; }
   transition: transform .22s var(--ease);
   animation:editor-drift 7s ease-in-out infinite;
 }
+html.gsap-ready .editor-window{ animation:none; transition:none; }
 @keyframes editor-drift{ 0%,100%{ translate:0 0; } 50%{ translate:0 -8px; } }
 .editor-titlebar{
   display:flex; align-items:center; gap:16px; padding: 12px 16px;
@@ -290,11 +305,11 @@ body.in-hero #net-canvas{ opacity:.7; }
 .about .wrap{ display:grid; grid-template-columns: .8fr 1.2fr; gap: 60px; align-items:flex-start; }
 .about-media{ position:sticky; top: calc(var(--header-h) + 24px); }
 .about-img-frame{
-  position:relative; overflow:hidden;
-  box-shadow: var(--shadow-md); aspect-ratio: 4/5;
+  position:relative; border-radius: clamp(22px,3vw,34px); overflow:hidden; border:0;
+  box-shadow: 0 28px 70px -28px rgba(0,0,0,.66); aspect-ratio: 4/5; transform:translateZ(0);
 }
-.about-img{ width:100%; height:100%; object-fit:cover; filter: grayscale(.15); transition: filter .4s;}
-.about-img-frame:hover .about-img{ filter: grayscale(0); }
+.about-img{ width:100%; height:100%; object-fit:cover; filter:grayscale(.12) contrast(1.04); transition:filter .55s var(--ease),transform 1s var(--ease); border:0; }
+.about-img-frame:hover .about-img{ filter:grayscale(0) contrast(1.06); transform:scale(1.035); }
 .about-tag{
   position:absolute; bottom:14px; left:14px; background: color-mix(in srgb, var(--bg) 70%, transparent);
   backdrop-filter: blur(8px); border:1px solid var(--border); padding:8px 12px; border-radius: var(--radius-sm);

@@ -1,22 +1,32 @@
 # Portfolio projects
 
-Eight small, independent builds for Ayan.dev. The four browser demos run as static GitHub Pages paths. The Telegram bots and automation examples use only Node/Python built-ins plus their platform APIs.
+Eight compact projects for Ayan.dev. Each opens as a live Vercel demo, with project source grouped by folder in this repository.
 
-| Project | Kind | Try it |
+| Project | Demo | What it does |
 | --- | --- | --- |
-| [Mori Studio](mori-studio/) | Studio landing page and brief planner | [Open demo](mori-studio/) |
-| [Steppe Atlas](steppe-atlas/) | Kazakhstan route planner | [Open demo](steppe-atlas/) |
-| [Form & Field](form-and-field/) | Small-batch shop and local cart | [Open demo](form-and-field/) |
-| [Quiet Signal](quiet-signal/) | Focus timer and task list | [Open demo](quiet-signal/) |
-| [Study Buddy](study-buddy/) | Telegram study companion | Source and setup below |
-| [Pocket Ledger](pocket-ledger/) | Telegram expense tracker | Source and setup below |
-| [Issue Sorter](issue-sorter/) | GitHub Actions issue labeling | Source and setup below |
-| [Morning Wire](morning-wire/) | RSS and optional AI Telegram digest | Source and setup below |
+| Mori Studio | [Open the website](https://mori-studio-blush.vercel.app/) | Studio landing page and brief planner |
+| Steppe Atlas | [Open the website](https://steppe-atlas.vercel.app/) | Kazakhstan route planner |
+| Form & Field | [Open the website](https://form-and-field-snowy.vercel.app/) | Product filters, local cart and demo checkout |
+| Quiet Signal | [Open the website](https://quiet-signal-eight.vercel.app/) | Focus timer and private task list |
+| Study Buddy | [Open the planner](https://study-buddy-two-livid.vercel.app/) | Browser study planner; Telegram bot source is included |
+| Pocket Ledger | [Open the tracker](https://pocket-ledger-orpin.vercel.app/) | Local expense tracker with filters and CSV export |
+| Issue Sorter | [Open the preview](https://issue-sorter.vercel.app/) | Rule-based issue labels with a dry-run GitHub Actions companion |
+| Morning Wire | [Open the digest](https://morning-wire-pi.vercel.app/) | Live Hacker News RSS reading list with saved stories |
 
-## Bot setup
+## Telegram bot source
 
-Both bots use long polling and keep their simple data store in an ignored local JSON file. Create each bot with Telegram's BotFather, set its `TELEGRAM_BOT_TOKEN` in the server environment, then run the relevant `.mjs` file with Node 20 or newer. Run each bot as a separate long-lived process. The sample JSON stores are not a shared database and should be replaced with durable storage before handling real users.
+The Study Buddy and Pocket Ledger source examples use long polling and save demo state in local JSON files. They are not active Telegram bots yet. Each needs its own bot token from BotFather and a private host with persistent storage. Keep the token in the host's secret store; do not place it in the repository.
 
-## Secret handling
+The portfolio helper is the only currently active Telegram bot: [@ayan_dev_portfolio_bot](https://t.me/ayan_dev_portfolio_bot).
 
-Copy `.env.example` to `.env.local` for local work, fill in only the values you need, and keep it out of version control. For Actions or Vercel, use the platform's secret settings instead. Never put an API key in a browser bundle, HTML file, workflow literal, screenshot, or README.
+## Automation source
+
+Issue Sorter includes a dry-run-first Python workflow example. Morning Wire includes a scheduled RSS-to-Telegram script and optional server-side OpenRouter summarization. They need repository workflow setup and secrets before scheduled delivery is enabled.
+
+## Secrets
+
+Never put API keys or bot tokens in browser code, committed files, workflow literals, screenshots, or README text. Use GitHub Actions Secrets or the hosting provider's secret settings. Public demos do not require an API key.
+
+## Notes
+
+Mori Studio and Form & Field are fictional product concepts. Steppe Atlas locations are illustrative, not travel guidance. Form & Field does not take payments. Browser demos store personal sample data in that browser only.

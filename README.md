@@ -7,7 +7,7 @@ Portfolio site and project lab for Ayan Abdimutalip.
 
 ## Project lab
 
-Eight new examples live in [`projects/`](projects/README.md): four interactive browser demos, two Telegram bots, and two workflow automations. The demos are static and run directly on GitHub Pages. Bot state is local to the host that runs the bot; use durable storage before handling real users.
+Eight portfolio demos are listed in [`projects/`](projects/README.md), each with a direct Vercel URL. The set includes four interactive websites, a study planner, an expense tracker, an issue triage preview and a live RSS reading list. The Telegram bot and workflow scripts are source examples; the Study Buddy and Pocket Ledger bots are not active yet and need separate BotFather tokens plus a host with persistent storage.
 
 Mori Studio and Form &amp; Field are fictional product concepts. Steppe Atlas route distances and stops are illustrative, not travel guidance. The storefront checkout is a demo and does not take payments.
 
@@ -29,4 +29,4 @@ GitHub Pages does not run the `/api` handlers. The static demos still work there
 
 ## Local preview
 
-Open `index.html` in a local static server, or deploy the repository root to GitHub Pages. The four project demos are available under `projects/`.
+Open `index.html` in a local static server, or deploy the repository root to GitHub Pages. Direct live project links are in [`projects/README.md`](projects/README.md).

@@ -105,9 +105,15 @@ function portfolioBotReply(text, chat) {
   if (command === '/projects') {
     return [
       'Проекты Ayan.dev:',
-      'Демо сайтов: https://ayan-dev-projects.vercel.app/#projects',
-      'Боты и автоматизации: https://github.com/Jarv1s-stack/Ayan.dev/tree/main/projects',
-      'Портфолио: https://ayan-dev-projects.vercel.app/'
+      'Mori Studio: https://mori-studio-blush.vercel.app/',
+      'Steppe Atlas: https://steppe-atlas.vercel.app/',
+      'Form & Field: https://form-and-field-snowy.vercel.app/',
+      'Quiet Signal: https://quiet-signal-eight.vercel.app/',
+      'Study Buddy demo: https://study-buddy-two-livid.vercel.app/',
+      'Pocket Ledger demo: https://pocket-ledger-orpin.vercel.app/',
+      'Issue Sorter demo: https://issue-sorter.vercel.app/',
+      'Morning Wire: https://morning-wire-pi.vercel.app/',
+      'Бот портфолио: https://t.me/ayan_dev_portfolio_bot'
     ].join('\n');
   }
   if (command === '/contact') return 'Форма связи: https://ayan-dev-projects.vercel.app/#contact';

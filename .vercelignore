@@ -1,0 +1,7 @@
+.git/
+.vercel/
+.env
+.env.*
+!.env.example
+projects/*/data.json
+node_modules/

@@ -16,6 +16,8 @@ The public site uses Vercel serverless handlers in [`api/`](api/). The browser s
 
 For Vercel, set these values under **Project → Settings → Environment Variables**. Never put them in `ai-assistant.js`, `script.js`, a browser bundle, a workflow literal, or a committed `.env` file. Once configured, the form sends the visitor's name, email, optional Telegram handle, subject and message to that chat after submission.
 
+The sample uses OpenRouter's [`openrouter/free` router](https://openrouter.ai/openrouter/free) so the assistant can be prototyped without purchased credits. It selects an available free model, so model behavior can vary between requests. Set a fixed paid model in Vercel after adding credits if you want stable model selection.
+
 If a credential has been committed to a public repository, revoke and replace it. Removing it from the latest files does not remove older Git history.
 
 GitHub Pages does not run the `/api` handlers. The static demos still work there; live AI chat and contact delivery require a Vercel deployment with the environment variables configured. Copy `.env.example` to `.env.local` for local development and keep that file private.

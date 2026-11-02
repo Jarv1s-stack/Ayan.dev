@@ -89,7 +89,7 @@ function matchesSecret(actual, expected) {
   return actualBytes.length === expectedBytes.length && timingSafeEqual(actualBytes, expectedBytes);
 }
 
-function portfolioBotReply(text) {
+function portfolioBotReply(text, chat) {
   const command = text.trim().split(/\s+/, 1)[0].split('@', 1)[0].toLowerCase();
   if (command === '/start' || command === '/help') {
     return [
@@ -98,6 +98,7 @@ function portfolioBotReply(text) {
       '',
       '/projects — проекты и исходники',
       '/contact — форма связи',
+      '/chatid — ID этого чата для уведомлений',
       '/help — список команд'
     ].join('\n');
   }
@@ -110,7 +111,11 @@ function portfolioBotReply(text) {
     ].join('\n');
   }
   if (command === '/contact') return 'Форма связи: https://ayan-dev-projects.vercel.app/#contact';
-  return 'Попробуйте /projects, /contact или /help.';
+  if (command === '/chatid') {
+    if (chat.type !== 'private') return 'Откройте со мной личный чат и отправьте /chatid.';
+    return `ID этого чата: ${chat.id}. Добавьте его в Vercel как Secret TELEGRAM_CHAT_ID, чтобы получать сообщения из формы.`;
+  }
+  return 'Попробуйте /projects, /contact, /chatid или /help.';
 }
 
 async function handleTelegram(request) {
@@ -134,7 +139,7 @@ async function handleTelegram(request) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         chat_id: message.chat.id,
-        text: portfolioBotReply(clean(message.text, 2_000)),
+        text: portfolioBotReply(clean(message.text, 2_000), message.chat),
         disable_web_page_preview: true
       }),
       signal: AbortSignal.timeout(12_000)

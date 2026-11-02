@@ -13,7 +13,7 @@ Mori Studio and Form &amp; Field are fictional product concepts. Steppe Atlas ro
 
 ## Telegram portfolio bot
 
-The [@ayan_dev_portfolio_bot](https://t.me/ayan_dev_portfolio_bot) responds to `/start`, `/help`, `/projects` and `/contact`. It runs through a Vercel webhook, so it does not need a polling process on a laptop. Keep `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` in Vercel Production Secrets. The contact form additionally needs `TELEGRAM_CHAT_ID`, which you can configure after starting the bot in Telegram.
+The [@ayan_dev_portfolio_bot](https://t.me/ayan_dev_portfolio_bot) responds to `/start`, `/help`, `/projects`, `/contact` and `/chatid`. It runs through a Vercel webhook, so it does not need a polling process on a laptop. Keep `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` in Vercel Production Secrets. After opening the bot and sending `/start`, use `/chatid` to get the chat ID, then save it as the `TELEGRAM_CHAT_ID` Production Secret to enable contact form notifications.
 
 ## AI assistant and contact form
 

@@ -11,6 +11,10 @@ Eight new examples live in [`projects/`](projects/README.md): four interactive b
 
 Mori Studio and Form &amp; Field are fictional product concepts. Steppe Atlas route distances and stops are illustrative, not travel guidance. The storefront checkout is a demo and does not take payments.
 
+## Telegram portfolio bot
+
+The [@ayan_dev_portfolio_bot](https://t.me/ayan_dev_portfolio_bot) responds to `/start`, `/help`, `/projects` and `/contact`. It runs through a Vercel webhook, so it does not need a polling process on a laptop. Keep `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET` in Vercel Production Secrets. The contact form additionally needs `TELEGRAM_CHAT_ID`, which you can configure after starting the bot in Telegram.
+
 ## AI assistant and contact form
 
 The public site uses Vercel serverless handlers in [`api/`](api/). The browser sends chat messages to `/api/chat`; the handler reads `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` from the Vercel environment. Contact form submissions go to `/api/contact`, which reads `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` from that same server-side environment.

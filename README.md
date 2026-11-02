@@ -3,6 +3,7 @@
 Portfolio site and project lab for Ayan Abdimutalip.
 
 **Live portfolio:** <https://jarv1s-stack.github.io/Ayan.dev/>
+**Vercel deployment:** <https://ayan-dev-projects.vercel.app/>
 
 ## Project lab
 

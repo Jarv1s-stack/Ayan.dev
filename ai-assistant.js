@@ -1,30 +1,10 @@
-/* ============================================================
-   Ayan.dev — AI Assistant
-   Self-contained chat widget: talks to OpenRouter's chat-completions
-   API DIRECTLY from the browser (no proxy), renders markdown,
-   remembers the conversation for the session.
-
-   WARNING: CONFIG.apiKey below ships inside this JS file and is
-   readable by anyone who opens devtools on your site. Anyone can
-   copy it and use your OpenRouter quota/billing. Only keep it here
-   if this file truly never goes anywhere public (no GitHub, no
-   hosting, no sharing the folder). See cloudflare-worker.js if you
-   ever want the safer, key-hidden setup back.
-   ============================================================ */
+/* Ayan.dev AI assistant. Its API key stays in the server environment. */
 
 (function () {
   'use strict';
 
   /* ===================== config ===================== */
-  const CONFIG = {
-    // Your OpenRouter API key, used directly from the browser. Exposed to
-    // anyone who views page source / devtools — see warning above.
-    // Get one at https://openrouter.ai/keys
-    apiKey: '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',
-    model: 'openrouter/free', // бесплатная модель на OpenRouter
-    useReasoning: false, // nemotron умеет "думать" перед ответом — дольше, но точнее; включай при желании
-    maxHistoryMessages: 16, // how many past turns are sent back to the model
-  };
+  const CONFIG = { maxHistoryMessages: 16 };
 
   const UI_TEXT = {
     en: {
@@ -33,9 +13,10 @@
       placeholder: 'Ask me anything about Ayan…',
       welcome: "Hi! I'm Ayan's AI assistant. Ask me about his projects, skills, or how to work with him.",
       suggestions: ['Who is Ayan?', 'What can he do?', 'How much would a project cost?'],
-      error: "Something went wrong reaching the assistant. Please try again in a moment, or reach Ayan directly via the Contact section.",
-      timeout: "The assistant is taking too long to respond (40s+) — the model or the proxy is likely stuck. Try again, or reach Ayan directly via the Contact section.",
-      configError: 'The assistant is not configured yet — set CONFIG.apiKey in ai-assistant.js.',
+      error: 'Could not reach the assistant. Try again, or contact Ayan through the Contact section.',
+      timeout: 'The assistant is taking longer than expected. Try again or contact Ayan through the Contact section.',
+      configError: 'The assistant is not connected yet. Use the Contact section to reach Ayan.',
+      close: 'Close assistant', conversation: 'Conversation',
       copy: 'Copy',
       copied: 'Copied',
     },
@@ -45,9 +26,10 @@
       placeholder: 'Спросите что-нибудь об Ayan…',
       welcome: 'Привет! Я AI-ассистент Ayan. Спросите про его проекты, навыки или как с ним начать работу.',
       suggestions: ['Кто такой Ayan?', 'Что он умеет?', 'Сколько будет стоить проект?'],
-      error: 'Не удалось связаться с ассистентом. Попробуйте ещё раз чуть позже или напишите Ayan напрямую в разделе Contact.',
-      timeout: 'Ассистент отвечает слишком долго (40+ секунд) — похоже, модель или прокси зависли. Попробуйте ещё раз или напишите Ayan напрямую в разделе Contact.',
-      configError: 'Ассистент ещё не настроен — укажите CONFIG.apiKey в ai-assistant.js.',
+      error: 'Не удалось связаться с ассистентом. Попробуйте ещё раз или напишите Ayan через раздел Contact.',
+      timeout: 'Ассистент отвечает дольше обычного. Попробуйте ещё раз или напишите Ayan через раздел Contact.',
+      configError: 'Ассистент пока не подключён. Напишите Ayan через раздел Contact.',
+      close: 'Закрыть ассистента', conversation: 'Диалог',
       copy: 'Копировать',
       copied: 'Скопировано',
     },
@@ -188,31 +170,38 @@
     const t = UI_TEXT[state.lang];
 
     const launcher = document.createElement('button');
+    launcher.type = 'button';
     launcher.id = 'ai-launcher';
     launcher.setAttribute('aria-label', t.title);
+    launcher.setAttribute('aria-controls', 'ai-panel');
+    launcher.setAttribute('aria-expanded', 'false');
     launcher.innerHTML = `
       <span class="ai-launcher-prompt">&gt;</span>
       <span class="ai-launcher-text" id="ai-launcher-text"></span>
       <span class="ai-launcher-caret"></span>
-      <i class="fa-solid fa-xmark ai-launcher-close-icon"></i>
+      <i class="fa-solid fa-xmark ai-launcher-close-icon" aria-hidden="true"></i>
     `;
 
     const panel = document.createElement('div');
     panel.id = 'ai-panel';
+    panel.setAttribute('role', 'region');
+    panel.setAttribute('aria-label', t.conversation);
+    panel.setAttribute('aria-hidden', 'true');
+    panel.inert = true;
     panel.innerHTML = `
       <div class="ai-header">
-        <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+        <div class="ai-avatar"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
         <div>
           <div class="ai-title">${t.title}</div>
           <div class="ai-subtitle"><span class="ai-status-dot"></span>${t.subtitle}</div>
         </div>
-        <button class="ai-header-close" id="ai-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+        <button class="ai-header-close" id="ai-close" type="button" aria-label="${t.close}"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
-      <div class="ai-messages" id="ai-messages"></div>
+      <div class="ai-messages" id="ai-messages" role="log" aria-label="${t.conversation}"></div>
       <div class="ai-suggestions" id="ai-suggestions"></div>
       <div class="ai-input-row">
-        <textarea id="ai-input" rows="1" placeholder="${t.placeholder}"></textarea>
-        <button id="ai-send" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
+        <textarea id="ai-input" rows="1" aria-label="${t.placeholder}" placeholder="${t.placeholder}"></textarea>
+        <button id="ai-send" type="button" aria-label="Send"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
       </div>
     `;
 
@@ -234,6 +223,19 @@
     wireEvents();
     wireEditorTabs();
     startLauncherTyping();
+    document.addEventListener('portfolio:language-changed', () => {
+      state.lang = getLang();
+      const nextText = UI_TEXT[state.lang];
+      els.launcher.setAttribute('aria-label', nextText.title);
+      els.panel.setAttribute('aria-label', nextText.conversation);
+      els.messages.setAttribute('aria-label', nextText.conversation);
+      els.close.setAttribute('aria-label', nextText.close);
+      els.input.setAttribute('aria-label', nextText.placeholder);
+      els.input.setAttribute('placeholder', nextText.placeholder);
+      const title = els.panel.querySelector('.ai-title');
+      if (title) title.textContent = nextText.title;
+      startLauncherTyping();
+    });
 
     // Draw the eye once, a couple seconds in — only if nobody has
     // interacted with the assistant yet and motion isn't disabled.
@@ -301,15 +303,19 @@
   }
 
   function wireEditorTabs() {
-    const aiTab = document.querySelector('#editor-tabs span[data-tab="ai"]');
-    const otherTabs = document.querySelectorAll('#editor-tabs span[data-tab]:not([data-tab="ai"])');
+    const aiTab = document.querySelector('#editor-tabs button[data-tab="ai"]');
+    const otherTabs = document.querySelectorAll('#editor-tabs button[data-tab]:not([data-tab="ai"])');
     const editorWindow = document.querySelector('.editor-window');
     const embedSlot = document.getElementById('ai-embed-slot');
     if (!aiTab || !editorWindow || !embedSlot) return;
 
     aiTab.addEventListener('click', () => {
-      document.querySelectorAll('#editor-tabs span[data-tab]').forEach((t) => t.classList.remove('active'));
+      document.querySelectorAll('#editor-tabs button[data-tab]').forEach((tab) => {
+        tab.classList.remove('active');
+        tab.setAttribute('aria-pressed', 'false');
+      });
       aiTab.classList.add('active');
+      aiTab.setAttribute('aria-pressed', 'true');
       editorWindow.classList.add('ai-active');
       ensureEmbedded(embedSlot);
     });
@@ -405,98 +411,37 @@
   /* ===================== streaming client ===================== */
   async function streamAssistantReply() {
     const t = UI_TEXT[state.lang];
-
-    if (!CONFIG.apiKey || CONFIG.apiKey.includes('ВСТАВЬТЕ_СЮДА')) {
-      appendAssistantBubble(t.configError, false);
-      return;
-    }
-
     const history = state.messages.slice(-CONFIG.maxHistoryMessages);
     const payload = {
-      model: CONFIG.model,
-      stream: true,
       messages: [
         { role: 'system', content: window.buildAyanSystemPrompt() },
-        ...history.map((m) => ({ role: m.role, content: m.content })),
+        ...history.map((message) => ({ role: message.role, content: message.content })),
       ],
-      reasoning: { enabled: !!CONFIG.useReasoning },
     };
 
-    const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
-
     appendTypingIndicator();
-
-    let bubble = null;
-    let fullText = '';
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 40000); // 40s safety timeout
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     try {
-      const res = await fetch(endpoint, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CONFIG.apiKey}`,
-          // Recommended by OpenRouter for attribution / their leaderboard —
-          // harmless to keep, safe to remove.
-          'HTTP-Referer': window.location.origin,
-          'X-Title': 'Ayan.dev AI Assistant',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
         signal: controller.signal,
       });
-
-      if (!res.ok) {
-        let detail = '';
-        try { detail = await res.text(); } catch (e) { /* ignore */ }
-        throw new Error(`OpenRouter API responded ${res.status}: ${detail.slice(0, 500)}`);
-      }
-      if (!res.body) throw new Error('Response has no body (streaming not supported here)');
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let buffer = '';
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split('\n');
-        buffer = lines.pop(); // last (possibly incomplete) line stays in buffer
-
-        for (const rawLine of lines) {
-          const line = rawLine.trim();
-          if (!line.startsWith('data:')) continue;
-          const data = line.slice(5).trim();
-          if (!data || data === '[DONE]') continue;
-          let parsed;
-          try { parsed = JSON.parse(data); } catch (e) { continue; }
-          const delta = parsed.choices && parsed.choices[0] && parsed.choices[0].delta;
-          // Skip reasoning tokens (delta.reasoning) — only stream the final answer.
-          const chunkText = delta && delta.content;
-          if (!chunkText) continue;
-
-          if (!bubble) {
-            removeTypingIndicator();
-            bubble = appendAssistantBubble('', true);
-          }
-          fullText += chunkText;
-          bubble.innerHTML = renderMarkdown(fullText);
-          scrollToBottom();
-        }
-      }
-
-      if (!bubble) { removeTypingIndicator(); throw new Error('Empty stream'); }
-      state.messages.push({ role: 'assistant', content: fullText });
-      clearTimeout(timeoutId);
-    } catch (err) {
-      clearTimeout(timeoutId);
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || typeof result.reply !== 'string') throw new Error('Assistant unavailable');
+      const reply = result.reply.trim();
+      if (!reply) throw new Error('Empty assistant reply');
       removeTypingIndicator();
-      if (bubble) return; // partial content already shown, don't overwrite it with an error
-      const isTimeout = err && err.name === 'AbortError';
-      appendAssistantBubble(isTimeout ? t.timeout : t.error, false);
-      console.error('[ai-assistant] request failed:', err);
+      appendAssistantBubble(reply, true);
+      state.messages.push({ role: 'assistant', content: reply });
+    } catch (error) {
+      removeTypingIndicator();
+      appendAssistantBubble(error.name === 'AbortError' ? t.timeout : t.error, false);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -529,23 +474,33 @@
   function openPanel() {
     state.open = true;
     state.everOpened = true;
+    els.panel.inert = false;
+    els.panel.setAttribute('aria-hidden', 'false');
+    els.launcher.setAttribute('aria-expanded', 'true');
     els.panel.classList.add('open');
     els.launcher.classList.add('open');
     els.launcher.classList.remove('attention');
-    setTimeout(() => els.input.focus(), 260);
+    setTimeout(() => { if (state.open) els.input.focus(); }, 260);
   }
 
   function closePanel() {
     state.open = false;
     els.panel.classList.remove('open');
     els.launcher.classList.remove('open');
+    els.launcher.setAttribute('aria-expanded', 'false');
+    els.panel.setAttribute('aria-hidden', 'true');
+    els.panel.inert = true;
+    const focusTarget = state.mode === 'embedded'
+      ? document.querySelector('#editor-tabs button[data-tab="about"]')
+      : els.launcher;
+    focusTarget?.focus();
   }
 
   function wireEvents() {
     els.launcher.addEventListener('click', () => (state.open ? closePanel() : openPanel()));
     els.close.addEventListener('click', () => {
       if (state.mode === 'embedded') {
-        const aboutTab = document.querySelector('#editor-tabs span[data-tab="about"]');
+        const aboutTab = document.querySelector('#editor-tabs button[data-tab="about"]');
         if (aboutTab) aboutTab.click();
       } else {
         closePanel();

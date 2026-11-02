@@ -204,3 +204,5 @@
   .editor-window.ai-active .editor-body{ height: 400px; min-height: 400px; }
   #ai-panel.ai-panel-embedded{ min-height: 400px; }
 }
+#ai-input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:560px){#ai-input{font-size:16px}}

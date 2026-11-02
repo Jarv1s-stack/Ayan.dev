@@ -10,6 +10,7 @@
 <link rel="icon" href="ghibli-photo.png" type="image/png">
 </head>
 <body data-theme="dark">
+  <a class="skip-link" href="#main-content" data-i18n="skip_to_content">Skip to main content</a>
 
 <canvas id="net-canvas"></canvas>
 <div id="cursor-glow"></div>
@@ -28,7 +29,7 @@
 <header>
   <div class="logo"><span class="dim">&lt;</span>Ayan<span class="dim">/&gt;</span><span class="cursor-blink"></span></div>
 
-  <nav id="nav">
+      <nav id="nav" aria-label="Primary navigation" data-i18n-aria-label="aria_primary_nav">
     <a href="#home" class="active" data-i18n="nav_home"><span class="idx">01</span>Home</a>
     <a href="#about" data-i18n="nav_about"><span class="idx">02</span>About</a>
     <a href="#skills" data-i18n="nav_skills"><span class="idx">03</span>Skills</a>
@@ -40,18 +41,20 @@
   <div class="header-actions">
     <button class="kbd-hint" id="cmdk-trigger" title="Command palette"><i class="fa-solid fa-terminal"></i><span data-i18n="cmdk_hint">Quick nav</span><kbd>Ctrl</kbd><kbd>K</kbd></button>
     <div class="social-icons">
-      <a href="https://github.com/Jarv1s-stack" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
+      <a aria-label="GitHub profile" data-i18n-aria-label="aria_github_profile" href="https://github.com/Jarv1s-stack" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i></a>
       <!-- <a href="https://www.linkedin.com/in/ayan-abdimutalip-5a5b5a2b5/" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a> -->
-      <a href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-telegram"></i></a>
+      <a aria-label="Telegram profile" data-i18n-aria-label="aria_telegram_profile" href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-telegram" aria-hidden="true"></i></a>
     </div>
-    <select class="lang-toggle" id="lang-toggle">
+    <select class="lang-toggle" id="lang-toggle" aria-label="Select language" data-i18n-aria-label="aria_select_language">
       <option value="en">EN</option>
       <option value="ru">RU</option>
     </select>
-    <button class="icon-btn theme-toggle" id="theme-toggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
-    <button class="mobile-menu-btn" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+    <button class="icon-btn theme-toggle" id="theme-toggle" aria-label="Toggle color theme" data-i18n-aria-label="aria_toggle_theme" title="Toggle theme"><i class="fas fa-moon"></i></button>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Toggle navigation menu" data-i18n-aria-label="aria_toggle_menu" aria-controls="nav" aria-expanded="false"><i class="fas fa-bars" aria-hidden="true"></i></button>
   </div>
 </header>
+
+<main id="main-content" tabindex="-1">
 
 <!-- ================= HERO ================= -->
 <section id="home" class="welcome">
@@ -76,10 +79,10 @@
     <div class="editor-window">
       <div class="editor-titlebar">
         <div class="traffic"><span></span><span></span><span></span></div>
-        <div class="editor-tabs" id="editor-tabs">
-          <span class="active" data-tab="about">about.js</span>
-          <span data-tab="skills">skills.json</span>
-          <span data-tab="contact">contact.md</span>
+        <div class="editor-tabs" id="editor-tabs" role="group" aria-label="Code examples">
+          <button type="button" class="active" data-tab="about" aria-controls="editor-body" aria-pressed="true">about.js</button>
+          <button type="button" data-tab="skills" aria-controls="editor-body" aria-pressed="false">skills.json</button>
+          <button type="button" data-tab="contact" aria-controls="editor-body" aria-pressed="false">contact.md</button>
         </div>
       </div>
       <div class="editor-body" id="editor-body">
@@ -106,13 +109,12 @@
 
       <div class="info-grid reveal-stagger">
         <div class="info-card"><div class="label" data-i18n="about_fullname">Fullname</div><div class="value">Abdimutalip Ayan</div></div>
-        <div class="info-card"><div class="label" data-i18n="about_dob">Date of birth</div><div class="value">June 18, 2009</div></div>
         <div class="info-card"><div class="label" data-i18n="about_address">Address</div><div class="value">Almaty, Kazakhstan</div></div>
         <div class="info-card"><div class="label" data-i18n="about_telegram">Telegram</div><div class="value"><a href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener">@ayanabdimutalip</a></div></div>
       </div>
 
       <div class="stat-row reveal-stagger">
-        <div class="stat-box"><span class="number" data-count="10">0</span><span class="label" data-i18n="about_stats">Projects complete</span></div>
+        <div class="stat-box"><span class="number" data-count="18">0</span><span class="label" data-i18n="about_stats">Projects complete</span></div>
         <div class="stat-box"><span class="number" data-count="9">0</span><span class="label" data-i18n="about_certs">Certificates earned</span></div>
         <div class="stat-box"><span class="number" data-count="3">0</span><span class="label" data-i18n="about_tools">Design tools</span></div>
       </div>
@@ -133,9 +135,9 @@
       <p data-i18n="skills_desc">I have expertise in various web technologies and design tools that help me build modern, polished web applications from concept to code.</p>
     </div>
 
-    <div class="skills-tabs reveal">
-      <button class="skills-tab-btn active" data-tab="dev" data-i18n="skills_tab_dev">Development</button>
-      <button class="skills-tab-btn" data-tab="design" data-i18n="skills_tab_design">Design Tools</button>
+    <div class="skills-tabs reveal" role="group" aria-label="Skill sets" data-i18n-aria-label="aria_skill_sets">
+      <button class="skills-tab-btn active" type="button" data-tab="dev" aria-pressed="true" data-i18n="skills_tab_dev">Development</button>
+      <button class="skills-tab-btn" type="button" data-tab="design" aria-pressed="false" data-i18n="skills_tab_design">Design Tools</button>
     </div>
 
     <div class="skills-panel active" id="panel-dev">
@@ -244,7 +246,7 @@
           <span class="saved-count" id="saved-count">0</span>
         </button>
       </div>
-      <p class="project-results" aria-live="polite"><span data-i18n="projects_showing">Showing</span> <strong id="projects-visible-count">7</strong> <span data-i18n="projects_of">of</span> <span id="projects-total-count">7</span> <span data-i18n="projects_count_label">projects</span></p>
+      <p class="project-results" aria-live="polite"><span data-i18n="projects_showing">Showing</span> <strong id="projects-visible-count">15</strong> <span data-i18n="projects_of">of</span> <span id="projects-total-count">15</span> <span data-i18n="projects_count_label">projects</span></p>
     </div>
     <div class="projects-grid reveal-stagger" id="projects-grid">
       <article class="project-card project-card--featured" data-project-id="ayan" data-category="web"><div class="project-card__top"><span class="project-index">01 / Featured</span><span class="project-status">Portfolio</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-terminal"></i></div><h3>Ayan.dev</h3><p data-i18n="project_ayan_desc">A hand-built developer portfolio with a console-inspired interface, motion, certificates and a clear way to start a conversation.</p><div class="project-tags"><span>HTML</span><span>CSS</span><span>JavaScript</span></div><a href="https://jarv1s-stack.github.io/Ayan.dev/" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a></article>
@@ -254,6 +256,14 @@
       <article class="project-card" data-project-id="events" data-category="web"><div class="project-card__top"><span class="project-index">05</span><span class="project-status">Full stack</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-calendar-days"></i></div><h3 data-i18n="project_event_title">Event Platform</h3><p data-i18n="project_event_desc">A full-stack web application for creating and managing events end-to-end.</p><div class="project-tags"><span>Full stack</span><span>Web app</span></div></article>
       <article class="project-card" data-project-id="bots" data-category="automation"><div class="project-card__top"><span class="project-index">06</span><span class="project-status">Bots</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-brands fa-telegram"></i></div><h3 data-i18n="project_bots_title">Telegram bots</h3><p data-i18n="project_bots_desc">Useful Telegram bots, including a Kazakh-language ticket-summary bot with numbered inline actions.</p><div class="project-tags"><span>Telegram</span><span>Automation</span></div></article>
       <article class="project-card" data-project-id="landing-pages" data-category="web"><div class="project-card__top"><span class="project-index">07</span><span class="project-status">UI / UX</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div><h3 data-i18n="project_landing_title">Landing pages</h3><p data-i18n="project_landing_desc">Custom animated landing pages built from scratch — no page-builder templates.</p><div class="project-tags"><span>Design</span><span>Motion</span></div></article>
+      <article class="project-card" data-project-id="mori-studio" data-category="web"><div class="project-card__top"><span class="project-index">08</span><span class="project-status">Website · Brief planner</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></div><h3>Mori Studio</h3><p data-i18n="project_mori_desc">A digital studio landing page with a lightweight project planner and a downloadable brief.</p><div class="project-tags"><span>Landing page</span><span>Brief planner</span><span>Responsive</span></div><a href="./projects/mori-studio/" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
+      <article class="project-card" data-project-id="steppe-atlas" data-category="web"><div class="project-card__top"><span class="project-index">09</span><span class="project-status">Travel · Route planner</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-route" aria-hidden="true"></i></div><h3>Steppe Atlas</h3><p data-i18n="project_atlas_desc">A route builder for slow travel in Kazakhstan, with region filters and a live itinerary.</p><div class="project-tags"><span>Travel</span><span>Route builder</span><span>SVG map</span></div><a href="./projects/steppe-atlas/" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
+      <article class="project-card" data-project-id="form-and-field" data-category="web"><div class="project-card__top"><span class="project-index">10</span><span class="project-status">Commerce · Storefront</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i></div><h3>Form &amp; Field</h3><p data-i18n="project_market_desc">A small-batch shop with product filters, a saved cart and a clear demo checkout.</p><div class="project-tags"><span>Commerce</span><span>Cart</span><span>Local storage</span></div><a href="./projects/form-and-field/" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
+      <article class="project-card" data-project-id="quiet-signal" data-category="web automation"><div class="project-card__top"><span class="project-index">11</span><span class="project-status">Productivity · Timer</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i></div><h3>Quiet Signal</h3><p data-i18n="project_quiet_desc">A calm focus timer and daily task list that keep progress in the browser.</p><div class="project-tags"><span>Focus timer</span><span>Task list</span><span>Offline</span></div><a href="./projects/quiet-signal/" class="project-link"><span data-i18n="project_open">Open project</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
+      <article class="project-card" data-project-id="study-buddy" data-category="automation"><div class="project-card__top"><span class="project-index">12</span><span class="project-status">Telegram · Study bot</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-brands fa-telegram" aria-hidden="true"></i></div><h3>Study Buddy</h3><p data-i18n="project_study_bot_desc">A small study companion bot with goals, check-ins, time zones and daily reminders.</p><div class="project-tags"><span>Telegram</span><span>Node.js</span><span>Scheduler</span></div><a href="https://github.com/Jarv1s-stack/Ayan.dev/tree/main/projects/study-buddy" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_source">View source</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
+      <article class="project-card" data-project-id="pocket-ledger" data-category="automation"><div class="project-card__top"><span class="project-index">13</span><span class="project-status">Telegram · Finance bot</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-wallet" aria-hidden="true"></i></div><h3>Pocket Ledger</h3><p data-i18n="project_ledger_desc">A private expense log with category totals, recent entries and undo controls.</p><div class="project-tags"><span>Telegram</span><span>Node.js</span><span>KZT</span></div><a href="https://github.com/Jarv1s-stack/Ayan.dev/tree/main/projects/pocket-ledger" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_source">View source</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
+      <article class="project-card" data-project-id="issue-sorter" data-category="automation"><div class="project-card__top"><span class="project-index">14</span><span class="project-status">GitHub · Workflow</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-tags" aria-hidden="true"></i></div><h3>Issue Sorter</h3><p data-i18n="project_issue_desc">A dry-run-first GitHub Actions workflow that labels issues with a least-privilege token.</p><div class="project-tags"><span>GitHub Actions</span><span>Python</span><span>Labels</span></div><a href="https://github.com/Jarv1s-stack/Ayan.dev/tree/main/projects/issue-sorter" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_source">View source</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
+      <article class="project-card" data-project-id="morning-wire" data-category="automation ai"><div class="project-card__top"><span class="project-index">15</span><span class="project-status">RSS · AI digest</span><button class="project-save" type="button" data-project-save aria-pressed="false"><i class="fa-regular fa-bookmark" aria-hidden="true"></i><span class="sr-only" data-i18n="project_save">Save project</span></button></div><div class="project-icon"><i class="fa-solid fa-sun" aria-hidden="true"></i></div><h3>Morning Wire</h3><p data-i18n="project_morning_desc">A scheduled RSS digest with an optional OpenRouter summary sent to a private Telegram chat.</p><div class="project-tags"><span>RSS</span><span>OpenRouter</span><span>Telegram</span></div><a href="https://github.com/Jarv1s-stack/Ayan.dev/tree/main/projects/morning-wire" target="_blank" rel="noopener" class="project-link"><span data-i18n="project_source">View source</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></article>
     </div>
     <p class="projects-empty" id="projects-empty" hidden data-i18n="projects_empty">Nothing matches these filters. Try a different search.</p>
   </div>
@@ -276,11 +286,7 @@
         <div class="info-item">
           <i class="fas fa-envelope"></i>
           <div><h3 data-i18n="contact_email">Email</h3><p id="email-text">ayanabdimutalip@gmail.com</p></div>
-          <button class="copy-btn" id="copy-email" title="Copy email"><i class="fa-regular fa-copy"></i></button>
-        </div>
-        <div class="info-item">
-          <i class="fas fa-phone"></i>
-          <div><h3 data-i18n="contact_phone">Phone</h3><p>+7 (700) 344-29-97</p></div>
+          <button class="copy-btn" id="copy-email" type="button" aria-label="Copy email address" data-i18n-aria-label="aria_copy_email" title="Copy email"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
         </div>
         <div class="local-time-box">
           <div class="lbl" data-i18n="contact_localtime">Local time in Almaty</div>
@@ -289,24 +295,25 @@
       </div>
       <form class="contact-form" id="contactForm">
         <div class="form-group">
-          <div class="form-field"><input type="text" name="name" placeholder=" " required><label data-i18n="contact_form_name">Your Name</label></div>
-          <div class="form-field"><input type="tel" name="phone" placeholder=" " required><label data-i18n="contact_form_phone">Your Phone</label></div>
+          <div class="form-field"><input id="contact-name" type="text" name="name" autocomplete="name" placeholder=" " required><label for="contact-name" data-i18n="contact_form_name">Your Name</label></div>
         </div>
         <div class="form-group">
-          <div class="form-field"><input type="email" name="email" placeholder=" " required><label data-i18n="contact_form_email">Your Email</label></div>
-          <div class="form-field"><input type="text" name="telegram" placeholder=" "><label data-i18n="contact_form_telegram">Telegram (optional)</label></div>
+          <div class="form-field"><input id="contact-email" type="email" name="email" autocomplete="email" placeholder=" " required><label for="contact-email" data-i18n="contact_form_email">Your Email</label></div>
+          <div class="form-field"><input id="contact-telegram" type="text" name="telegram" autocomplete="off" placeholder=" "><label for="contact-telegram" data-i18n="contact_form_telegram">Telegram (optional)</label></div>
         </div>
         <div class="form-group">
-          <div class="form-field"><input type="text" name="subject" placeholder=" " required><label data-i18n="contact_form_subject">Subject</label></div>
+          <div class="form-field"><input id="contact-subject" type="text" name="subject" placeholder=" " required><label for="contact-subject" data-i18n="contact_form_subject">Subject</label></div>
         </div>
         <div class="form-group">
-          <div class="form-field"><textarea name="message" placeholder=" " required></textarea><label data-i18n="contact_form_message">Your Message</label></div>
+          <div class="form-field"><textarea id="contact-message" name="message" placeholder=" " required></textarea><label for="contact-message" data-i18n="contact_form_message">Your Message</label></div>
         </div>
         <button type="submit" class="submit-btn"><i class="fa-solid fa-paper-plane"></i><span data-i18n="contact_form_submit">Send Message</span></button>
+        <p class="contact-privacy-note" data-i18n="contact_privacy_note">When the form is connected, your name, contact details and message are sent to Ayan’s private Telegram inbox. Please do not include passwords or payment details.</p>
       </form>
     </div>
   </div>
 </section>
+</main>
 
 <footer>
   <div class="wrap">
@@ -316,16 +323,16 @@
         <p data-i18n="footer_role">Frontend &amp; ChatBot Developer</p>
       </div>
       <div class="social-links">
-        <a href="https://github.com/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
-        <a href="https://www.linkedin.com/in/ayan-abdimutalip-5a5b5a2b5/" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
-        <a href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-telegram"></i></a>
+        <a aria-label="GitHub profile" data-i18n-aria-label="aria_github_profile" href="https://github.com/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i></a>
+        <a aria-label="LinkedIn profile" data-i18n-aria-label="aria_linkedin_profile" href="https://www.linkedin.com/in/ayan-abdimutalip-5a5b5a2b5/" target="_blank" rel="noopener"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+        <a aria-label="Telegram profile" data-i18n-aria-label="aria_telegram_profile" href="https://t.me/ayanabdimutalip" target="_blank" rel="noopener"><i class="fab fa-telegram" aria-hidden="true"></i></a>
       </div>
     </div>
     <div class="copyright"><p>© <span id="year"></span> Abdimutalip Ayan. <span data-i18n="footer_rights">All rights reserved.</span></p></div>
   </div>
 </footer>
 
-<button class="to-top" id="to-top" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+<button class="to-top" id="to-top" type="button" aria-label="Back to top" data-i18n-aria-label="aria_back_top" title="Back to top"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
 
 <!-- Certificate modal -->
 <div id="certificateModal" class="modal">
@@ -345,7 +352,7 @@
   <div class="cmdk-box">
     <div class="cmdk-input-row">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="cmdk-input" placeholder="Type a command or search…" autocomplete="off">
+      <input type="text" id="cmdk-input" aria-label="Search commands and sections" data-i18n-aria-label="aria_search_commands" placeholder="Type a command or search…" autocomplete="off">
       <span class="cmdk-esc">ESC</span>
     </div>
     <div class="cmdk-list" id="cmdk-list"></div>

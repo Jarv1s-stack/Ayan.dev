@@ -110,6 +110,41 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   };
 
+Object.assign(translations.en, {
+    projects_desc: 'A growing collection of websites, bots and small automations, built to solve clear everyday problems.',
+    toast_fail: 'The form could not send. Try again or contact Ayan on Telegram.',
+    project_mori_desc: 'A digital studio landing page with a lightweight project planner and a downloadable brief.',
+    project_atlas_desc: 'A route builder for slow travel in Kazakhstan, with region filters and a live itinerary.',
+    project_market_desc: 'A small-batch shop with product filters, a saved cart and a clear demo checkout.',
+    project_quiet_desc: 'A calm focus timer and daily task list that keep progress in the browser.',
+    project_study_bot_desc: 'A study companion bot with goals, check-ins, time zones and daily reminders.',
+    project_ledger_desc: 'A private expense log with category totals, recent entries and undo controls.',
+    project_issue_desc: 'A dry-run-first GitHub Actions workflow that labels issues with a least-privilege token.',
+    project_morning_desc: 'A scheduled RSS digest with an optional OpenRouter summary sent to a private Telegram chat.',
+    contact_privacy_note: 'When the form is connected, your name, contact details and message are sent to Ayan’s private Telegram inbox. Please do not include passwords or payment details.',
+    skip_to_content: 'Skip to main content', aria_select_language: 'Select language', aria_toggle_theme: 'Toggle color theme',
+    aria_copy_email: 'Copy email address', aria_github_profile: 'GitHub profile', aria_linkedin_profile: 'LinkedIn profile',
+    aria_telegram_profile: 'Telegram profile', aria_search_commands: 'Search commands and sections',
+    aria_toggle_menu: 'Toggle navigation menu', aria_primary_nav: 'Primary navigation', aria_back_top: 'Back to top', aria_skill_sets: 'Skill sets'
+  });
+  Object.assign(translations.ru, {
+    projects_desc: 'Коллекция сайтов, Telegram-ботов и небольших автоматизаций для понятных повседневных задач.',
+    toast_fail: 'Не удалось отправить форму. Попробуйте позже или напишите Аяну в Telegram.',
+    project_mori_desc: 'Лендинг цифровой студии с планировщиком проекта и загрузкой краткого брифа.',
+    project_atlas_desc: 'Планировщик поездок по Казахстану с фильтрами регионов и интерактивным маршрутом.',
+    project_market_desc: 'Небольшой магазин с фильтрами, сохранением корзины и демонстрационным оформлением заказа.',
+    project_quiet_desc: 'Спокойный таймер фокуса и список задач с сохранением прогресса в браузере.',
+    project_study_bot_desc: 'Учебный Telegram-бот с целями, отметками прогресса, часовыми поясами и напоминаниями.',
+    project_ledger_desc: 'Личный журнал расходов с разбивкой по категориям, последними записями и отменой.',
+    project_issue_desc: 'GitHub Actions с сухим запуском, который размечает задачи с минимальными правами токена.',
+    project_morning_desc: 'Автоматическая RSS-сводка с необязательным пересказом OpenRouter в личном Telegram.',
+    contact_privacy_note: 'При отправке формы имя, контакты и сообщение поступят в личный Telegram Аяна. Не указывайте пароли и платёжные данные.',
+    skip_to_content: 'Перейти к основному содержимому', aria_select_language: 'Выбрать язык', aria_toggle_theme: 'Переключить цветовую тему',
+    aria_copy_email: 'Скопировать адрес электронной почты', aria_github_profile: 'Профиль GitHub', aria_linkedin_profile: 'Профиль LinkedIn',
+    aria_telegram_profile: 'Профиль Telegram', aria_search_commands: 'Поиск по командам и разделам',
+    aria_toggle_menu: 'Открыть или закрыть навигацию', aria_primary_nav: 'Основная навигация', aria_back_top: 'Наверх', aria_skill_sets: 'Разделы навыков'
+  });
+
   let currentLang = safeGet('localStorage', 'lang') || 'en';
   const langToggle = document.getElementById('lang-toggle');
   langToggle.value = currentLang;
@@ -124,14 +159,25 @@ document.addEventListener('DOMContentLoaded', function () {
       const key = el.getAttribute('data-i18n-placeholder');
       if (dict[key] !== undefined) el.setAttribute('placeholder', dict[key]);
     });
+    document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+      const key = el.getAttribute('data-i18n-aria-label');
+      if (dict[key] !== undefined) el.setAttribute('aria-label', dict[key]);
+    });
+    document.querySelectorAll('.project-card .project-link').forEach(link => {
+      const title = link.closest('.project-card')?.querySelector('h3')?.textContent.trim();
+      const action = link.querySelector('[data-i18n]')?.textContent.trim();
+      if (title && action) link.setAttribute('aria-label', `${action}: ${title}`);
+    });
     document.documentElement.setAttribute('lang', lang);
   }
 
   function setLang(lang) {
     currentLang = lang;
+    document.documentElement.lang = lang;
     safeSet('localStorage', 'lang', lang);
     langToggle.value = lang;
     applyTranslations(lang);
+    document.dispatchEvent(new CustomEvent('portfolio:language-changed', { detail: { lang } }));
     updateProjectExplorer({ animate: false });
     restartRoleTyping();
     buildCommandList();
@@ -145,7 +191,8 @@ document.addEventListener('DOMContentLoaded', function () {
   document.documentElement.setAttribute('data-theme', currentTheme);
   updateThemeIcon(currentTheme);
   function updateThemeIcon(theme) {
-    themeToggle.innerHTML = `<i class="fas fa-${theme === 'dark' ? 'sun' : 'moon'}"></i>`;
+    themeToggle.innerHTML = `<i class="fas fa-${theme === 'dark' ? 'sun' : 'moon'}" aria-hidden="true"></i>`;
+    themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
   }
   function toggleTheme() {
     const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -270,24 +317,49 @@ document.addEventListener('DOMContentLoaded', function () {
     navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#${current}`));
   }, { passive: true });
 
-  toTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  toTopBtn.addEventListener('click', () => {
+    document.querySelector('header a[href="#home"]')?.focus({ preventScroll: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   /* ===================== smooth nav + mobile menu ===================== */
   const nav = document.getElementById('nav');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileNavQuery = window.matchMedia('(max-width: 980px)');
+  function syncMobileNavState() {
+    const isMobile = mobileNavQuery.matches;
+    const isOpen = isMobile && nav.classList.contains('active');
+    nav.inert = isMobile && !isOpen;
+    nav.setAttribute('aria-hidden', String(isMobile && !isOpen));
+    mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+  }
+  syncMobileNavState();
+  mobileNavQuery.addEventListener('change', syncMobileNavState);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && mobileNavQuery.matches && nav.classList.contains('active')) {
+      nav.classList.remove('active');
+      syncMobileNavState();
+      mobileMenuBtn.focus();
+    }
+  });
   document.querySelectorAll('nav a').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       e.preventDefault();
       const target = document.querySelector(this.getAttribute('href'));
       if (target) window.scrollTo({ top: target.offsetTop - 70, behavior: 'smooth' });
+      const menuWasOpen = nav.classList.contains('active');
       nav.classList.remove('active');
-      mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+      mobileMenuBtn.innerHTML = '<i class="fas fa-bars" aria-hidden="true"></i>';
+      syncMobileNavState();
+      if (menuWasOpen && mobileNavQuery.matches) mobileMenuBtn.focus();
     });
   });
   mobileMenuBtn.addEventListener('click', () => {
     nav.classList.toggle('active');
     const isActive = nav.classList.contains('active');
-    mobileMenuBtn.innerHTML = `<i class="fas fa-${isActive ? 'times' : 'bars'}"></i>`;
+    mobileMenuBtn.innerHTML = `<i class="fas fa-${isActive ? 'times' : 'bars'}" aria-hidden="true"></i>`;
+    syncMobileNavState();
   });
 
   /* ===================== scroll reveal ===================== */
@@ -418,8 +490,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      tabBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      tabBtns.forEach(b => {
+        const active = b === btn;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-pressed', String(active));
+      });
       Object.values(panels).forEach(p => p.classList.remove('active'));
       const target = panels[btn.dataset.tab];
       target.classList.add('active');
@@ -563,11 +638,14 @@ document.addEventListener('DOMContentLoaded', function () {
      The 4th tab (ai.chat) is handled by ai-assistant.js — it owns the
      "active" class there too, since it needs to also toggle the embedded
      chat panel in lockstep. Here we just react to the 3 "code" tabs. */
-  document.querySelectorAll('#editor-tabs span[data-tab]').forEach((tabEl) => {
+  document.querySelectorAll('#editor-tabs button[data-tab]').forEach((tabEl) => {
     tabEl.addEventListener('click', () => {
       if (tabEl.dataset.tab === 'ai') return;
-      document.querySelectorAll('#editor-tabs span[data-tab]').forEach((t) => t.classList.remove('active'));
-      tabEl.classList.add('active');
+      document.querySelectorAll('#editor-tabs button[data-tab]').forEach((tab) => {
+        const active = tab === tabEl;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-pressed', String(active));
+      });
       typeCode(codeSnippets[tabEl.dataset.tab] || codeSnippets.about);
     });
   });
@@ -1046,47 +1124,32 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ===================== contact form ===================== */
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const submitBtn = contactForm.querySelector('.submit-btn');
-      submitBtn.disabled = true;
-
+    contactForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const submitButton = contactForm.querySelector('.submit-btn');
+      submitButton.disabled = true;
       const formData = {
-        name: this.querySelector('input[name="name"]').value,
-        phone: this.querySelector('input[name="phone"]').value || 'Not provided',
-        email: this.querySelector('input[name="email"]').value,
-        telegram: this.querySelector('input[name="telegram"]').value || 'Not provided',
-        subject: this.querySelector('input[name="subject"]').value,
-        message: this.querySelector('textarea[name="message"]').value
+        name: this.querySelector('input[name="name"]').value.trim(),
+        phone: this.querySelector('input[name="phone"]').value.trim(),
+        email: this.querySelector('input[name="email"]').value.trim(),
+        telegram: this.querySelector('input[name="telegram"]').value.trim(),
+        subject: this.querySelector('input[name="subject"]').value.trim(),
+        message: this.querySelector('textarea[name="message"]').value.trim()
       };
-      const message = `New Client Inquiry:\n\nName: ${formData.name}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nTelegram: ${formData.telegram}\nSubject: ${formData.subject}\nMessage: ${formData.message}`;
-
-      // NOTE: keeping the same Telegram Bot API approach as before.
-      // See the message accompanying this file about moving these
-      // credentials out of client-side code.
-      const BOT_TOKEN = '8156472399:AAE8bC_yX9JcylpFD7wMXKPWo_5gLhElIXE';
-      const CHAT_ID = '6768870909';
-      const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
-      fetch(TELEGRAM_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT_ID, text: message })
-      })
-        .then(response => response.json())
-        .then(data => {
-          submitBtn.disabled = false;
-          if (data.ok) {
-            showToast(translations[currentLang].toast_sent);
-            contactForm.reset();
-          } else {
-            showToast(translations[currentLang].toast_fail, 'error');
-          }
-        })
-        .catch(() => {
-          submitBtn.disabled = false;
-          showToast(translations[currentLang].toast_fail, 'error');
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
         });
+        if (!response.ok) throw new Error('Contact delivery is unavailable.');
+        showToast(translations[currentLang].toast_sent);
+        contactForm.reset();
+      } catch {
+        showToast(translations[currentLang].toast_fail, 'error');
+      } finally {
+        submitButton.disabled = false;
+      }
     });
   }
 

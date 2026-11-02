@@ -1,0 +1,11 @@
+{
+  "action": "opened",
+  "issue": {
+    "number": 42,
+    "title": "The export button crashes on an empty list",
+    "body": "When the list has no items, clicking export throws an error."
+  },
+  "repository": {
+    "full_name": "owner/repository"
+  }
+}

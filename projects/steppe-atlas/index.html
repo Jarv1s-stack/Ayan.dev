@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A route planner for slow, memorable trips across Kazakhstan.">
+  <meta name="theme-color" content="#0e2527">
+  <title>Steppe Atlas — Choose a slower road</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#top">Skip to main content</a>
+  <header class="topbar"><a class="brand" href="#top"><span class="brand-symbol" aria-hidden="true">⌁</span>STEPPE ATLAS</a><nav aria-label="Main navigation"><a href="#routes">Routes</a><a href="#how">Travel slowly</a></nav><a class="return" href="../../">Ayan.dev <span aria-hidden="true">↗</span></a></header>
+  <main id="top" tabindex="-1">
+    <section class="hero wrap"><div class="hero-copy"><p class="hero-kicker"><span></span> Kazakhstan, at your own pace</p><h1>Somewhere<br>between <i>here</i><br>and <i>quiet.</i></h1><p>Build a thoughtful route through wide skies, warm springs and little places worth staying for.</p><a class="hero-button" href="#routes">Explore the map <span aria-hidden="true">↓</span></a><div class="hero-stats"><span><strong>12</strong> places to linger</span><span><strong>4</strong> regions</span><span><strong>1</strong> good pair of shoes</span></div></div>
+      <div class="map-panel" role="img" aria-label="Illustrated route map of Kazakhstan with four highlighted stops"><div class="map-top"><span>FIELD NOTES / 04</span><span>43°N — 67°E</span></div><svg viewBox="0 0 520 490" aria-hidden="true"><path class="land" d="M43 142 74 104l57 11 29-22 36 17 43-12 29 21 42-9 17 30 49-8 14 30 38 17-11 35 25 27-21 33 4 35-39 21-13 42-37 8-22-20-36 16-29-27-39 7-26-19-40 13-17-23-48 7-14-30-36-8 5-35-31-21 10-31-27-22Z"/><path class="route" d="M99 191C148 150 181 215 229 197s61 42 110 22 61 32 91 3"/><path class="route route-alt" d="M229 197c-27 61 11 108 65 131s52 47 70 72"/><g class="map-place"><circle cx="99" cy="191" r="7"/><text x="71" y="174">KARAKOL</text></g><g class="map-place map-place--active"><circle cx="229" cy="197" r="10"/><text x="201" y="177">ALMATY</text></g><g class="map-place"><circle cx="339" cy="219" r="7"/><text x="315" y="202">CHARYN</text></g><g class="map-place"><circle cx="364" cy="400" r="7"/><text x="337" y="425">KOLSAI</text></g><circle class="map-star" cx="157" cy="303" r="3"/><circle class="map-star" cx="294" cy="114" r="3"/><circle class="map-star" cx="430" cy="326" r="3"/><path class="contour" d="M83 351c51-27 61 24 112 1s66-30 95 2 55 37 103 4M117 379c46-23 63 12 104-2s63-21 91 8 48 22 80 4"/></svg><div class="map-note"><span>ROUTE OF THE MONTH</span><strong>Almaty → Charyn → Kolsai</strong><small>3 days · 418 km</small></div></div></section>
+
+    <section class="route-section wrap" id="routes"><div class="route-heading"><div><p class="section-kicker">Choose a direction</p><h2>Find your kind<br>of far away.</h2></div><p>Every route is a starting point. Keep the stops that feel right, leave room for the unplanned ones.</p></div>
+      <div class="route-controls"><div class="filter-tabs" role="group" aria-label="Filter routes by region"><button class="filter active" type="button" data-region="all" aria-pressed="true">All regions</button><button class="filter" type="button" data-region="south" aria-pressed="false">South</button><button class="filter" type="button" data-region="east" aria-pressed="false">East</button><button class="filter" type="button" data-region="west" aria-pressed="false">West</button></div><label class="duration-filter">Time available <select id="duration"><option value="all">Any length</option><option value="2">Up to 2 days</option><option value="4">Up to 4 days</option></select></label></div>
+      <div class="route-layout"><div class="route-list" id="route-list" aria-live="polite"></div><aside class="itinerary" aria-label="Your selected route"><div class="itinerary-top"><span>YOUR ROUTE</span><span class="route-count" id="route-count">0</span></div><h3 id="itinerary-title">A map, still open</h3><p class="itinerary-empty" id="itinerary-empty">Choose a stop to begin. Add a few and make the route yours.</p><ol id="itinerary-items"></ol><div class="itinerary-total"><span>Estimated drive</span><strong id="itinerary-distance">0 km</strong></div><button class="route-clear" type="button" id="clear-route">Clear route</button></aside></div>
+    </section>
+    <section class="slow-note" id="how"><div class="wrap slow-inner"><span class="slow-mark" aria-hidden="true">↝</span><div><p class="section-kicker">A note for the road</p><h2>Leave the afternoon<br>unscheduled.</h2></div><p>Distances in Kazakhstan can be generous. These routes leave breathing room between stops, so the journey feels like part of the place.</p></div></section>
+  </main>
+  <footer class="footer"><a class="brand" href="#top"><span class="brand-symbol" aria-hidden="true">⌁</span>STEPPE ATLAS</a><span>Made for taking the long way.</span><a href="../../">Back to Ayan.dev ↗</a></footer>
+</body>
+</html>

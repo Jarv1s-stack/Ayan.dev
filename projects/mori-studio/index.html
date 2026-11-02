@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mori Studio turns thoughtful strategy into useful digital products.">
+  <meta name="theme-color" content="#eef2f9">
+  <title>Mori Studio — Digital work with a point of view</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#top">Skip to main content</a>
+  <header class="topbar">
+    <a class="wordmark" href="#top" aria-label="Mori Studio home"><span class="wordmark-mark">m.</span><span>Mori Studio</span></a>
+    <nav aria-label="Main navigation"><a href="#work">What we do</a><a href="#approach">Approach</a><a href="#brief">Project planner</a></nav>
+    <a class="back-link" href="../../">Back to Ayan.dev <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="top" tabindex="-1">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="availability"><span></span> Independent digital studio · Almaty</p>
+        <h1 id="hero-title">Make useful<br><em>things matter.</em></h1>
+        <p class="intro">We shape clear ideas into websites and products people enjoy using. Small team, close collaboration, careful craft.</p>
+        <a class="button button-dark" href="#brief">Plan a project <span aria-hidden="true">↗</span></a>
+        <p class="hero-note">Strategy, interface design &amp; front-end engineering</p>
+      </div>
+      <div class="hero-art" aria-label="Abstract cobalt and coral studio artwork" role="img">
+        <div class="art-grid"></div><div class="art-halo"></div><div class="art-disc"></div>
+        <div class="art-orbit"><span>MAKE<br>IT CLEAR</span></div>
+        <svg class="art-line" viewBox="0 0 480 360" aria-hidden="true"><path d="M-12 262C77 290 78 92 178 95s61 209 162 167c70-29 57-151 157-176"/></svg>
+        <span class="art-caption">Ideas, made tangible<br>since 2022</span>
+      </div>
+    </section>
+
+    <section class="work wrap" id="work" aria-labelledby="work-title">
+      <div class="section-heading"><p class="section-label">A focused set of skills</p><h2 id="work-title">From first sketch<br>to working product.</h2></div>
+      <div class="service-list">
+        <article class="service-row"><span class="service-number">A</span><div><h3>Product direction</h3><p>Find the smallest useful version, map the flow and agree on what success looks like.</p></div><span class="service-mark" aria-hidden="true">↗</span></article>
+        <article class="service-row"><span class="service-number">B</span><div><h3>Interface design</h3><p>Make the important choices easy with a distinct visual system and accessible details.</p></div><span class="service-mark" aria-hidden="true">↗</span></article>
+        <article class="service-row"><span class="service-number">C</span><div><h3>Front-end build</h3><p>Ship a fast, responsive website that feels deliberate on every screen size.</p></div><span class="service-mark" aria-hidden="true">↗</span></article>
+      </div>
+    </section>
+
+    <section class="approach" id="approach" aria-labelledby="approach-title">
+      <div class="wrap approach-inner"><div><p class="section-label">How we work</p><h2 id="approach-title">One good question<br>at a time.</h2></div><p class="approach-copy">We keep the process close to the work: understand the people using it, make a prototype, learn from it, then build with care. No hand-offs into a black box.</p><div class="approach-stamp" aria-hidden="true">THINK<br>— MAKE<br>— LEARN</div></div>
+    </section>
+
+    <section class="planner wrap" id="brief" aria-labelledby="planner-title">
+      <div class="planner-intro"><p class="section-label">A useful first step</p><h2 id="planner-title">Sketch your brief.</h2><p>Choose what you need and get a tidy starting point to discuss. This estimate is a planning aid, not a quote.</p></div>
+      <form class="planner-form" id="brief-form">
+        <fieldset><legend>What are you making?</legend><div class="choice-row">
+          <label class="choice"><input type="checkbox" name="service" value="Strategy" data-price="350"><span>Product direction</span></label>
+          <label class="choice"><input type="checkbox" name="service" value="Design" data-price="500"><span>Interface design</span></label>
+          <label class="choice"><input type="checkbox" name="service" value="Build" data-price="900"><span>Front-end build</span></label>
+        </div></fieldset>
+        <label class="field-label" for="project-size">How many pages or key views?</label>
+        <div class="range-row"><input id="project-size" name="project-size" type="range" min="1" max="8" value="3"><output id="size-output" for="project-size">3 views</output></div>
+        <div class="estimate"><div><span>Working estimate</span><strong id="estimate-total">$1,000–$1,400</strong></div><button class="button button-blue" type="submit">Download brief <span aria-hidden="true">↓</span></button></div>
+        <p class="form-feedback" id="form-feedback" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap footer-inner"><a class="wordmark" href="#top"><span class="wordmark-mark">m.</span><span>Mori Studio</span></a><span>Clear thinking. Useful things.</span><a href="../../">Back to Ayan.dev ↗</a></div></footer>
+</body>
+</html>

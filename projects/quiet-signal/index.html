@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A quiet place to plan a focused work session.">
+  <meta name="theme-color" content="#271d34">
+  <title>Quiet Signal — Find your next clear hour</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#top">Skip to main content</a>
+  <header class="topbar"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">◉</span>QUIET SIGNAL</a><div class="date-label" id="today-label">TODAY / YOUR OWN PACE</div><a class="return" href="../../">Ayan.dev ↗</a></header>
+  <main class="dashboard wrap" id="top" tabindex="-1">
+    <section class="welcome"><div><p class="welcome-label">A softer start</p><h1>Make room for<br><em>one good thing.</em></h1><p>Set a small intention, give it your attention, then take a breath.</p></div><div class="welcome-mark" aria-hidden="true"><span></span><i></i></div></section>
+    <div class="workspace">
+      <section class="focus-panel" aria-labelledby="focus-title"><div class="panel-top"><div><p class="panel-kicker">A little space to think</p><h2 id="focus-title">Focus session</h2></div><span class="session-count"><strong id="session-count">0</strong> sessions</span></div><div class="timer-wrap"><svg class="timer-ring" viewBox="0 0 240 240" role="img" aria-label="Focus timer progress"><circle class="ring-track" cx="120" cy="120" r="105"></circle><circle class="ring-progress" id="ring-progress" cx="120" cy="120" r="105"></circle></svg><div class="timer-face"><span class="timer-mode" id="timer-mode">READY WHEN YOU ARE</span><strong id="timer-display">25:00</strong><span class="timer-hint" id="timer-hint">A quiet block for one task</span></div></div><div class="timer-presets" role="group" aria-label="Choose focus duration"><button class="preset active" type="button" data-minutes="25" aria-pressed="true">25 min</button><button class="preset" type="button" data-minutes="50" aria-pressed="false">50 min</button><button class="preset" type="button" data-minutes="5" aria-pressed="false">Short reset</button></div><div class="timer-actions"><button class="start-timer" id="start-timer" type="button">Begin focus <span aria-hidden="true">→</span></button><button class="reset-timer" id="reset-timer" type="button">Reset</button></div><p class="timer-status" id="timer-status" role="status">Your timer is paused.</p></section>
+      <section class="tasks-panel" aria-labelledby="tasks-title"><div class="panel-top"><div><p class="panel-kicker">Keep it kind and specific</p><h2 id="tasks-title">Today’s list</h2></div><span class="task-progress"><strong id="task-progress">0 / 0</strong> done</span></div><form class="task-form" id="task-form"><label class="sr-only" for="task-input">Add a task</label><input id="task-input" name="task" maxlength="80" placeholder="What would feel good to finish?" autocomplete="off" required><button type="submit" aria-label="Add task">+</button></form><ul class="task-list" id="task-list"></ul><p class="task-feedback" id="task-feedback" role="status"></p><button class="undo-clear" id="undo-task-change" type="button" hidden>Undo</button><div class="empty-note" id="empty-note"><span aria-hidden="true">✳</span><p>Your list has room for one thing.<br>That is enough to begin.</p></div><div class="day-progress"><div class="progress-copy"><span>A little progress</span><strong id="progress-value">0%</strong></div><div class="progress-track"><span id="progress-fill"></span></div></div></section>
+    </div>
+    <section class="closing-note"><span aria-hidden="true">✺</span><p>Rest is part of the work.<br><strong>Come back when you're ready.</strong></p><button type="button" id="clear-completed">Clear completed tasks</button></section>
+  </main>
+  <footer class="footer"><span>Quiet Signal · your focus stays in this browser</span><a href="../../">Back to Ayan.dev</a></footer>
+</body>
+</html>

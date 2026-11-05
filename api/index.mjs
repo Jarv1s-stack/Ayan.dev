@@ -1,4 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
+import { handleChat as handleCloneChat, handleTts as handleCloneTts } from '../lib/assistant.mjs';
 
 const requestsByAddress = globalThis.__ayanApiRequests || (globalThis.__ayanApiRequests = new Map());
 
@@ -36,45 +37,6 @@ async function readJson(request, maxLength) {
     return { value: JSON.parse(raw) };
   } catch {
     return { error: 'invalid_json', status: 400 };
-  }
-}
-
-async function handleChat(request) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL;
-  if (!apiKey || !model) return json({ error: 'assistant_unavailable' }, 503);
-
-  const parsed = await readJson(request, 24_000);
-  if (parsed.error) return json({ error: parsed.error }, parsed.status);
-  const payload = parsed.value;
-  if (!payload || typeof payload !== 'object') return json({ error: 'invalid_messages' }, 400);
-  if (!Array.isArray(payload.messages) || payload.messages.length > 18) return json({ error: 'invalid_messages' }, 400);
-
-  const messages = payload.messages.slice(-18).filter(message =>
-    message && ['system', 'user', 'assistant'].includes(message.role) &&
-    typeof message.content === 'string' && message.content.length <= (message.role === 'system' ? 12_000 : 4_000)
-  );
-  if (!messages.length || !messages.some(message => message.role === 'user')) return json({ error: 'empty_messages' }, 400);
-
-  try {
-    const upstream = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        'content-type': 'application/json',
-        'http-referer': new URL(request.url).origin,
-        'x-title': 'Ayan.dev AI Assistant'
-      },
-      body: JSON.stringify({ model, messages, temperature: 0.65, max_tokens: 700 }),
-      signal: AbortSignal.timeout(28_000)
-    });
-    if (!upstream.ok) return json({ error: 'assistant_provider_error' }, 502);
-    const result = await upstream.json();
-    const reply = result.choices?.[0]?.message?.content;
-    if (typeof reply !== 'string' || !reply.trim()) return json({ error: 'assistant_empty_reply' }, 502);
-    return json({ reply: reply.trim() });
-  } catch {
-    return json({ error: 'assistant_request_failed' }, 502);
   }
 }
 
@@ -239,10 +201,8 @@ export default {
     if (!isSameOrigin(request)) return json({ error: 'origin_not_allowed' }, 403);
     const address = requestAddress(request);
 
-    if (route === 'chat') {
-      if (!allowRequest(address, 8, 60_000)) return json({ error: 'rate_limit' }, 429);
-      return handleChat(request);
-    }
+    if (route === 'chat') return handleCloneChat(request);
+    if (route === 'tts') return handleCloneTts(request);
     if (route === 'contact') {
       if (!allowRequest(address, 4, 10 * 60_000)) return json({ error: 'rate_limit' }, 429);
       return handleContact(request);

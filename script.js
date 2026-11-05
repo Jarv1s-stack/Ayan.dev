@@ -112,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 Object.assign(translations.en, {
     projects_desc: 'A growing collection of websites, bots and small automations, built to solve clear everyday problems.',
+    project_fluctlight_title: 'Fluctlight',
+    project_fluctlight_desc: 'A first-person digital clone of Ayan inside an interactive Three.js light field, with text and voice chat.',
     toast_fail: 'The form could not send. Try again or contact Ayan on Telegram.',
     project_mori_desc: 'A digital studio landing page with a lightweight project planner and a downloadable brief.',
     project_atlas_desc: 'A route builder for slow travel in Kazakhstan, with region filters and a live itinerary.',
@@ -130,6 +132,8 @@ Object.assign(translations.en, {
   });
   Object.assign(translations.ru, {
     projects_desc: 'Коллекция сайтов, Telegram-ботов и небольших автоматизаций для понятных повседневных задач.',
+    project_fluctlight_title: 'Fluctlight',
+    project_fluctlight_desc: 'Цифровой клон Аяна от первого лица внутри интерактивного светового поля Three.js — с текстовым и голосовым диалогом.',
     toast_fail: 'Не удалось отправить форму. Попробуйте позже или напишите Аяну в Telegram.',
     project_mori_desc: 'Лендинг цифровой студии с планировщиком проекта и загрузкой краткого брифа.',
     project_atlas_desc: 'Планировщик поездок по Казахстану с фильтрами регионов и интерактивным маршрутом.',

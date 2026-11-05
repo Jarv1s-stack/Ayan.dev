@@ -36,6 +36,11 @@ window.AYAN_KNOWLEDGE = {
 
   projects: [
     {
+      name: 'Fluctlight — Ayan’s digital clone',
+      description: 'A first-person digital clone inside an interactive Three.js light field, integrated as a local part of this portfolio with text and voice chat.',
+      link: 'projects/fluctlight/'
+    },
+    {
       name: 'Jarvis — local AI desktop assistant',
       description:
         'A local, offline-first AI assistant for Windows with voice control, file handling ' +

@@ -1,0 +1,39 @@
+{
+  "name": "Ayan Abdimutalip",
+  "role": "Frontend & AI Developer",
+  "location": "Almaty, Kazakhstan",
+  "summary": "I build polished websites, web applications, AI assistants and automation. I work across interface design, frontend development and backend integrations, and prefer making a product feel considered instead of assembling a template.",
+  "skills": [
+    "React", "Vite", "JavaScript", "HTML", "CSS", "Responsive Design",
+    "Framer Motion", "Three.js", "Node.js", "Express.js", "REST APIs",
+    "PostgreSQL", "MongoDB", "Git & GitHub", "Figma", "CorelDRAW",
+    "Adobe Photoshop", "AI integration", "LLM and prompt engineering",
+    "Local AI models with Ollama"
+  ],
+  "services": [
+    "Full-stack web applications",
+    "Animated websites and landing pages",
+    "AI chatbots and assistants",
+    "UI/UX design from Figma to production",
+    "Telegram bot development"
+  ],
+  "projects": [
+    { "name": "Fluctlight", "description": "A first-person digital clone of Ayan inside an interactive Three.js light field, with text, voice input and Fish Audio speech." },
+    { "name": "Ayan.dev", "description": "A hand-built developer portfolio with a console-inspired interface, motion, certificates and an integrated AI clone." },
+    { "name": "Jarvis", "description": "A local, offline-first Windows assistant with voice control, file handling and automation through local AI models." },
+    { "name": "Steppe Atlas", "description": "A route builder for slow travel in Kazakhstan with region filters and a live itinerary." },
+    { "name": "Mori Studio", "description": "A digital studio landing page with a lightweight project planner and a downloadable brief." },
+    { "name": "Form & Field", "description": "A small-batch shop concept with product filters, a saved cart and a demo checkout." },
+    { "name": "Study Buddy", "description": "A browser study planner with goals, check-ins and reminders." },
+    { "name": "Pocket Ledger", "description": "A local expense tracker with categories and CSV export." },
+    { "name": "Morning Wire", "description": "A Hacker News digest with saved stories and optional AI and Telegram automation." },
+    { "name": "Telegram bots", "description": "Bots for practical automation, including a Kazakh-language ticket-summary bot." }
+  ],
+  "contacts": {
+    "github": "https://github.com/Jarv1s-stack",
+    "email": "ayanabdimutalip@gmail.com",
+    "telegram": "https://t.me/ayanabdimutalip",
+    "portfolio": "https://jarv1s-stack.github.io/Ayan.dev/"
+  },
+  "collaboration_note": "Project prices and timelines depend on the scope and complexity. Ask a few questions and discuss the details through the portfolio contact form or Telegram."
+}

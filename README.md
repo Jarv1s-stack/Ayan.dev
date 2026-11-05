@@ -17,7 +17,7 @@ The [@ayan_dev_portfolio_bot](https://t.me/ayan_dev_portfolio_bot) responds to `
 
 ## AI assistant and contact form
 
-The public site uses Vercel serverless handlers in [`api/`](api/). The browser sends chat messages to `/api/chat`; the handler adds the first-person digital-clone prompt from [`data/digital_clone.json`](data/digital_clone.json) on the server and reads `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` from Vercel. Fluctlight speech is generated through `/api/tts` with Fish Audio credentials on the server. Contact form submissions go to `/api/contact`, which reads `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` from that same environment.
+The public site uses Vercel serverless handlers in [`api/`](api/). The browser sends chat messages to `/api/chat`; the handler adds Ayan's first-person persona prompt from [`data/digital_clone.json`](data/digital_clone.json) on the server and reads `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` from Vercel. Fluctlight streams timestamped speech through `/api/tts` with Fish Audio credentials on the server. Contact form submissions go to `/api/contact`, which reads `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` from that same environment.
 
 For Vercel, set these values under **Project → Settings → Environment Variables**: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CHAT_ID`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `FISH_AUDIO_API_KEY`, `FISH_AUDIO_MODEL_ID`, and optionally `FISH_AUDIO_TTS_MODEL`. Never put credentials in browser code, a workflow literal, or a committed `.env` file. Once configured, the contact form sends the visitor's name, email, optional Telegram handle, subject and message to the portfolio's Telegram inbox after submission.
 

@@ -128,10 +128,10 @@ controls.zoomSpeed = 0.6;
 controls.enablePan = false;
 controls.minDistance = 2.6;
 controls.maxDistance = 22;
-controls.autoRotate = false;
+controls.autoRotate = motionEnabled;
 controls.autoRotateSpeed = 0.42;
 
-const params = { chaos: 0.55, glow: 1.08, density: 0.85, pulse: 0.6, shell: true };
+const params = { chaos: 0.55, glow: 1.08, density: 0.85, pulse: 0.6 };
 
 const U = {
   uTime: { value: 0 },
@@ -154,6 +154,7 @@ const voice = {
   speaking: 0, speakingTarget: 0,
   listening: 0, listeningTarget: 0,
   thinking: 0, thinkingTarget: 0,
+  typing: 0, typingTarget: 0,
   // brief warm flash layered on the core each time a word lands
   flash: 0,
 };
@@ -166,6 +167,7 @@ window.Fluctlight = {
   setListening(on) { voice.listeningTarget = on ? 1 : 0; },
   // waiting on the AI reply — a slower, searching unease before it speaks
   setThinking(on) { voice.thinkingTarget = on ? 1 : 0; },
+  setTyping(on) { voice.typingTarget = on ? 1 : 0; },
 };
 
 const group = new THREE.Group();
@@ -569,112 +571,19 @@ const gradePass = new ShaderPass({
 composer.addPass(gradePass);
 composer.addPass(new OutputPass());
 
-/* ------------------------------ UI -------------------------------- */
-
-const $ = (id) => document.getElementById(id);
-const fmt = (v) => Number(v).toFixed(2);
-
-function bindSlider(id, outId, key, after) {
-  const el = $(id), out = $(outId);
-  const apply = () => {
-    const v = parseFloat(el.value);
-    params[key] = v;
-    out.textContent = fmt(v);
-    if (after) after(v);
-    if (!motionEnabled) renderStatic();
-  };
-  el.addEventListener('input', apply);
-  apply();
-  return el;
-}
-
-const sChaos = bindSlider('chaos', 'outChaos', 'chaos', (v) => { U.uChaos.value = v; });
-const sGlow = bindSlider('glow', 'outGlow', 'glow', (v) => { bloom.strength = v; });
-const sDens = bindSlider('dens', 'outDens', 'density', (v) => { U.uDensity.value = v; });
-const sPulse = bindSlider('pulse', 'outPulse', 'pulse', (v) => { U.uPulse.value = v; });
-
-const spinInput = $('spin');
-const motionInput = $('motion');
-spinInput.checked = !REDUCED;
-motionInput.checked = !REDUCED;
-let spinEnabled = spinInput.checked;
-spinInput.addEventListener('change', (e) => {
-  spinEnabled = e.target.checked;
-  controls.autoRotate = motionEnabled && spinEnabled;
-  if (!motionEnabled) renderStatic();
-});
-motionInput.addEventListener('change', (e) => {
-  motionEnabled = e.target.checked;
-  controls.enableDamping = motionEnabled;
-  controls.autoRotate = motionEnabled && spinEnabled;
-  if (animationFrame !== null) cancelAnimationFrame(animationFrame);
-  animationFrame = null;
-  if (motionEnabled && !document.hidden) {
-    clock.start();
-    animationFrame = requestAnimationFrame(animate);
-  } else if (!document.hidden) {
-    renderStatic();
-  }
-});
-$('shell').addEventListener('change', (e) => {
-  shell.visible = e.target.checked;
-  if (!motionEnabled) renderStatic();
-});
+/* -------------------------- scene interaction --------------------- */
 controls.addEventListener('change', () => {
   if (!motionEnabled) renderStatic();
 });
-
-const panelToggle = $('panelToggle'), panelBody = $('panelBody');
-panelToggle.addEventListener('click', () => {
-  const open = panelToggle.getAttribute('aria-expanded') === 'true';
-  panelToggle.setAttribute('aria-expanded', String(!open));
-  panelBody.hidden = open;
-});
-
-const PRESETS = {
-  calm: { chaos: 0.18, glow: 0.8, density: 0.5, pulse: 0.22 },
-  think: { chaos: 0.55, glow: 1.15, density: 0.60, pulse: 0.6 },
-  overload: { chaos: 0.70, glow: 2.0, density: 1.0, pulse: 1.0 },
-};
-const sliders = { chaos: sChaos, glow: sGlow, density: sDens, pulse: sPulse };
-const outs = { chaos: $('outChaos'), glow: $('outGlow'), density: $('outDens'), pulse: $('outPulse') };
-let tween = null;
-
-document.querySelectorAll('.presets button').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.presets button').forEach((b) => b.removeAttribute('data-active'));
-    btn.setAttribute('data-active', '');
-    const target = PRESETS[btn.dataset.preset];
-    const from = { chaos: params.chaos, glow: params.glow, density: params.density, pulse: params.pulse };
-    if (!motionEnabled) {
-      Object.assign(params, target);
-      for (const [key, value] of Object.entries(target)) {
-        sliders[key].value = value;
-        outs[key].textContent = fmt(value);
-      }
-      U.uChaos.value = params.chaos;
-      U.uDensity.value = params.density;
-      U.uPulse.value = params.pulse;
-      bloom.strength = params.glow;
-      renderStatic();
-    } else {
-      tween = { from, target, t: 0 };
-    }
-  });
-});
-document.querySelector('.presets button[data-preset="think"]').setAttribute('data-active', '');
 
 canvas.addEventListener('dblclick', () => {
   controls.reset();
   camera.position.set(0, fitDistance * 0.042, fitDistance);
 });
 
-const rdLinks = $('rdLinks'), rdFlux = $('rdFlux');
-
 /* ------------------------------ loop ------------------------------ */
 
 const clock = new THREE.Clock();
-let readoutTimer = 0;
 let animationFrame = null;
 let sceneTime = 0;
 
@@ -712,8 +621,6 @@ window.addEventListener('resize', onResize);
 
 function renderStatic() {
   if (document.hidden || motionEnabled) return;
-  rdLinks.textContent = Math.round(COUNTS.filaments * params.density).toLocaleString('ru-RU');
-  rdFlux.textContent = Math.round(params.chaos * 100) + '%';
   controls.update();
   composer.render();
 }
@@ -729,40 +636,27 @@ function animate() {
   U.uTime.value = t;
   gradePass.uniforms.uTime.value = t;
 
-  if (tween) {
-    tween.t = Math.min(1, tween.t + dt * 1.5);
-    const e = 1 - Math.pow(1 - tween.t, 3);
-    for (const k of Object.keys(tween.target)) {
-      const v = tween.from[k] + (tween.target[k] - tween.from[k]) * e;
-      params[k] = v;
-      sliders[k].value = v;
-      outs[k].textContent = fmt(v);
-    }
-    U.uChaos.value = params.chaos;
-    U.uDensity.value = params.density;
-    U.uPulse.value = params.pulse;
-    bloom.strength = params.glow;
-    if (tween.t >= 1) tween = null;
-  }
-
   // ease the voice states and decay the per-word transients first, so
   // everything below (rotation speed, bands, wobble, color) can react to
   // the same-frame values instead of lagging one frame behind
   voice.speaking += (voice.speakingTarget - voice.speaking) * Math.min(1, dt * 4);
   voice.listening += (voice.listeningTarget - voice.listening) * Math.min(1, dt * 4);
   voice.thinking += (voice.thinkingTarget - voice.thinking) * Math.min(1, dt * 3);
+  voice.typing += (voice.typingTarget - voice.typing) * Math.min(1, dt * 7);
   voice.energy *= Math.pow(0.015, dt);
   voice.flash *= Math.pow(0.006, dt);
 
-  group.rotation.y += dt * 0.05 * (0.3 + params.chaos) * (1 + voice.speaking * 0.5);
+  const activity = voice.typing + voice.speaking * 0.8 + voice.thinking * 0.35;
+  group.rotation.y += dt * (0.05 + voice.typing * 0.09) * (0.3 + params.chaos) * (1 + voice.speaking * 0.5);
   // speaking adds a faster head-nod-like wobble; thinking a slow, searching drift
-  const wobbleAmp = 0.06 * (1 + voice.speaking * 0.7) + voice.thinking * 0.03;
-  const wobbleFreq = 0.13 + voice.speaking * 0.35 + voice.thinking * 0.05;
+  const wobbleAmp = 0.06 * (1 + voice.speaking * 0.7) + voice.thinking * 0.03 + voice.typing * 0.095;
+  const wobbleFreq = 0.13 + voice.speaking * 0.35 + voice.thinking * 0.05 + voice.typing * 0.52;
   group.rotation.x = Math.sin(t * wobbleFreq) * wobbleAmp;
+  group.scale.setScalar(1 + Math.sin(t * (0.75 + activity * 2.4)) * (0.006 + activity * 0.018));
   filaments.rotation.y -= dt * 0.035 * (0.4 + params.chaos);
   // rings spin up while the reply is spoken, giving the orb a distinct
   // "voice" gait instead of just brightness changes
-  const ringBoost = 1 + voice.speaking * 1.6 + voice.thinking * 0.4;
+  const ringBoost = 1 + voice.speaking * 1.6 + voice.thinking * 0.4 + voice.typing * 1.1;
   rings[0].rotation.z += dt * 0.09 * ringBoost;
   rings[1].rotation.x -= dt * 0.06 * ringBoost;
   rings[2].rotation.y += dt * 0.12 * ringBoost;
@@ -770,7 +664,7 @@ function animate() {
   // glitch bands blink at random intervals, more often under load and
   // markedly more often while actually speaking a reply
   for (const b of bands) {
-    b.userData.next -= dt * (0.4 + params.chaos * 2.4 + voice.speaking * 1.8 + voice.thinking * 0.7);
+    b.userData.next -= dt * (0.4 + params.chaos * 2.4 + voice.speaking * 1.8 + voice.thinking * 0.7 + voice.typing * 1.4);
     if (b.userData.next <= 0) {
       b.userData.on = 1;
       b.userData.next = 1.2 + Math.random() * 5;
@@ -780,23 +674,15 @@ function animate() {
     b.material.uniforms.uOn.value = b.userData.on;
   }
 
-  U.uPulse.value = Math.min(1.5, params.pulse + voice.energy * 0.65 + voice.speaking * 0.14 + voice.thinking * 0.08);
-  U.uChaos.value = Math.min(1.2, params.chaos + voice.speaking * 0.10 + voice.listening * 0.06 + voice.thinking * 0.08);
-  bloom.strength = params.glow + voice.energy * 0.32 + voice.speaking * 0.1 + voice.thinking * 0.05;
+  U.uPulse.value = Math.min(1.5, params.pulse + voice.energy * 0.65 + voice.speaking * 0.14 + voice.thinking * 0.08 + voice.typing * 0.12);
+  U.uChaos.value = Math.min(1.2, params.chaos + voice.speaking * 0.10 + voice.listening * 0.06 + voice.thinking * 0.08 + voice.typing * 0.16);
+  bloom.strength = params.glow + voice.energy * 0.32 + voice.speaking * 0.1 + voice.thinking * 0.05 + voice.typing * 0.18;
 
   gradePass.uniforms.uAberr.value = 0.0016 + params.chaos * 0.0042 + voice.energy * 0.0018;
 
   // core briefly warms from cyan toward gold on each spoken word, then
   // eases back — a visible "voice" tell distinct from the ambient pulse
   core.material.uniforms.uColor.value.copy(CORE_COLOR_BASE).lerp(CORE_COLOR_SPEAK, Math.min(1, voice.flash));
-
-  readoutTimer -= dt;
-  if (readoutTimer <= 0) {
-    readoutTimer = 0.22;
-    const links = Math.round(COUNTS.filaments * params.density);
-    rdLinks.textContent = links.toLocaleString('ru-RU');
-    rdFlux.textContent = Math.round(params.chaos * 100) + '%';
-  }
 
   controls.update();
   composer.render();
@@ -819,16 +705,8 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// start collapsed on small screens so the cluster owns the frame
-if (SMALL) {
-  panelToggle.setAttribute('aria-expanded', 'false');
-  panelBody.hidden = true;
-}
-
 onResize();
 camera.position.set(0, fitDistance * 0.042, fitDistance);
-controls.autoRotate = motionEnabled && spinEnabled;
-rdLinks.textContent = Math.round(COUNTS.filaments * params.density).toLocaleString('ru-RU');
-rdFlux.textContent = Math.round(params.chaos * 100) + '%';
+controls.autoRotate = motionEnabled;
 if (!document.hidden && motionEnabled) animationFrame = requestAnimationFrame(animate);
 else renderStatic();

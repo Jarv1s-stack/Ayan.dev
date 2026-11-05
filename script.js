@@ -111,9 +111,14 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
 Object.assign(translations.en, {
+    nav_consult: 'Consultation', cmd_consult: 'Go to Consultation',
+    consult_eyebrow: 'Work with me', consult_title: 'Consultation with Ayan',
+    consult_desc: 'Bring an idea or a challenge. I can help shape the next step across web products, interface design, AI integration and automation.',
+    consult_topic_web: 'Web products', consult_topic_design: 'UI / UX', consult_topic_ai: 'AI integration', consult_topic_auto: 'Automation',
+    consult_cta: 'Request a consultation', consult_topics_aria: 'Consultation topics',
     projects_desc: 'A growing collection of websites, bots and small automations, built to solve clear everyday problems.',
     project_fluctlight_title: 'Fluctlight',
-    project_fluctlight_desc: 'A first-person digital clone of Ayan inside an interactive Three.js light field, with text and voice chat.',
+    project_fluctlight_desc: 'An interactive Three.js scene where visitors can talk with Ayan through text or voice.',
     toast_fail: 'The form could not send. Try again or contact Ayan on Telegram.',
     project_mori_desc: 'A digital studio landing page with a lightweight project planner and a downloadable brief.',
     project_atlas_desc: 'A route builder for slow travel in Kazakhstan, with region filters and a live itinerary.',
@@ -131,9 +136,14 @@ Object.assign(translations.en, {
     aria_toggle_menu: 'Toggle navigation menu', aria_primary_nav: 'Primary navigation', aria_back_top: 'Back to top', aria_skill_sets: 'Skill sets'
   });
   Object.assign(translations.ru, {
+    nav_consult: 'Консультация', cmd_consult: 'Перейти к консультации',
+    consult_eyebrow: 'Обсудим идею', consult_title: 'Консультация с Аяном',
+    consult_desc: 'Приходи с идеей или задачей. Вместе определим следующий шаг для веб-продукта, интерфейса, интеграции ИИ или автоматизации.',
+    consult_topic_web: 'Веб-продукты', consult_topic_design: 'UI / UX', consult_topic_ai: 'Интеграция ИИ', consult_topic_auto: 'Автоматизация',
+    consult_cta: 'Запросить консультацию', consult_topics_aria: 'Темы консультации',
     projects_desc: 'Коллекция сайтов, Telegram-ботов и небольших автоматизаций для понятных повседневных задач.',
     project_fluctlight_title: 'Fluctlight',
-    project_fluctlight_desc: 'Цифровой клон Аяна от первого лица внутри интерактивного светового поля Three.js — с текстовым и голосовым диалогом.',
+    project_fluctlight_desc: 'Интерактивная сцена Three.js, где можно поговорить с Аяном текстом или голосом.',
     toast_fail: 'Не удалось отправить форму. Попробуйте позже или напишите Аяну в Telegram.',
     project_mori_desc: 'Лендинг цифровой студии с планировщиком проекта и загрузкой краткого брифа.',
     project_atlas_desc: 'Планировщик поездок по Казахстану с фильтрами регионов и интерактивным маршрутом.',
@@ -1052,6 +1062,7 @@ Object.assign(translations.en, {
       { group: t.cmdk_nav, icon: 'fa-code', label: t.cmd_skills, run: () => scrollToId('skills') },
       { group: t.cmdk_nav, icon: 'fa-code-branch', label: t.cmd_journey, run: () => scrollToId('resume') },
       { group: t.cmdk_nav, icon: 'fa-folder-open', label: t.cmd_projects, run: () => scrollToId('projects') },
+      { group: t.cmdk_nav, icon: 'fa-comments', label: t.cmd_consult, run: () => scrollToId('consultation') },
       { group: t.cmdk_nav, icon: 'fa-envelope', label: t.cmd_contact, run: () => scrollToId('contact') },
       { group: t.cmdk_actions, icon: 'fa-circle-half-stroke', label: t.cmd_theme, run: toggleTheme },
       { group: t.cmdk_actions, icon: 'fa-language', label: t.cmd_lang, run: () => setLang(currentLang === 'en' ? 'ru' : 'en') },
@@ -1129,6 +1140,13 @@ Object.assign(translations.en, {
 
   /* ===================== contact form ===================== */
   const contactForm = document.getElementById('contactForm');
+  document.querySelector('.consultation-cta')?.addEventListener('click', () => {
+    const subject = contactForm?.querySelector('[name="subject"]');
+    if (subject) {
+      subject.value = currentLang === 'ru' ? 'Консультация с Аяном' : 'Consultation with Ayan';
+      subject.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
   if (contactForm) {
     contactForm.addEventListener('submit', async function (event) {
       event.preventDefault();
@@ -1136,7 +1154,7 @@ Object.assign(translations.en, {
       submitButton.disabled = true;
       const formData = {
         name: this.querySelector('input[name="name"]').value.trim(),
-        phone: this.querySelector('input[name="phone"]').value.trim(),
+        phone: this.querySelector('input[name="phone"]')?.value.trim() || '',
         email: this.querySelector('input[name="email"]').value.trim(),
         telegram: this.querySelector('input[name="telegram"]').value.trim(),
         subject: this.querySelector('input[name="subject"]').value.trim(),

@@ -1,190 +1,447 @@
-/* Fluctlight chat client. Provider credentials stay on the server. */
+/* Fluctlight: stream the answer, prepare Fish Audio in parallel, and reveal
+   each character against Fish Audio's word timestamps. Provider keys stay server-side. */
 
-const $ = (id) => document.getElementById(id);
-const chatLog = $('chatLog');
-const chatForm = $('chatForm');
-const chatInput = $('chatInput');
-const sendBtn = $('sendBtn');
-const micBtn = $('micBtn');
-const voiceBtn = $('voiceBtn');
-const chatStatus = $('chatStatus');
-const chatStatusText = $('chatStatusText');
-const chatSuggestions = $('chatSuggestions');
+const chatLog = document.getElementById('chatLog');
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const chatStatus = document.getElementById('chatStatus');
 
 const history = [];
 const MAX_HISTORY_MESSAGES = 16;
 const MAX_MESSAGE_LENGTH = 2000;
+const MAX_SPEECH_CHUNK = 360;
 let busy = false;
-let voiceEnabled = true;
-let listening = false;
-let activeAudio = null;
-let activeAudioUrl = null;
-let audioPulse = null;
 let speechToken = 0;
+let audioContext = null;
+let activeSource = null;
+let speechQueue = [];
+let queueCursor = 0;
+let queueWaiters = [];
+let speechDone = false;
+let fullReply = '';
+let renderedReply = '';
 
-function setStatus(state, text) {
-  chatStatus.dataset.state = state;
-  chatStatusText.textContent = text;
+function setStatus(state, message) {
+  document.body.dataset.state = state;
+  chatStatus.textContent = message;
 }
 
-function addMessage(role, text) {
-  const el = document.createElement('div');
-  el.className = 'msg ' + (role === 'user' ? 'msg--user' : 'msg--ai');
-  const textNode = document.createTextNode(text);
-  el.appendChild(textNode);
-  chatLog.appendChild(el);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  return { el, textNode };
+function prepareAudio() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  if (!audioContext) audioContext = new AudioContextClass();
+  if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+  return audioContext;
+}
+
+function notifyQueue() {
+  for (const wake of queueWaiters.splice(0)) wake();
 }
 
 function stopVoiceOutput() {
   speechToken += 1;
   window.speechSynthesis?.cancel();
-  if (activeAudio) {
-    activeAudio.pause();
-    activeAudio.removeAttribute('src');
-    activeAudio.load();
-    activeAudio = null;
-  }
-  if (activeAudioUrl) URL.revokeObjectURL(activeAudioUrl);
-  activeAudioUrl = null;
-  clearInterval(audioPulse);
-  audioPulse = null;
+  try { activeSource?.stop(); } catch {}
+  activeSource = null;
+  notifyQueue();
   window.Fluctlight?.setSpeaking(false);
   return speechToken;
 }
 
-function finishAudio(audio, token) {
-  if (token !== speechToken || activeAudio !== audio) return;
-  clearInterval(audioPulse);
-  audioPulse = null;
-  activeAudio = null;
-  if (activeAudioUrl) URL.revokeObjectURL(activeAudioUrl);
-  activeAudioUrl = null;
-  window.Fluctlight?.setSpeaking(false);
-  if (!busy && !listening) setStatus('idle', 'Готов к вопросу');
+function replaceOutput(text) {
+  renderedReply = text;
+  chatLog.textContent = text;
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function appendOutput(text) {
+  if (!text) return;
+  renderedReply += text;
+  chatLog.textContent = renderedReply;
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function cleanStreamText(raw) {
+  let clean = String(raw || '')
+    .replace(/<think(?:ing)?\b[^>]*>[\s\S]*?<\/think(?:ing)?\s*>/gi, '')
+    .replace(/<think(?:ing)?\b[^>]*>[\s\S]*$/gi, '')
+    .replace(/<\/(?:think|thinking)\s*>/gi, '');
+  for (const tag of ['<thinking>', '<think>']) {
+    for (let length = 1; length < tag.length; length += 1) {
+      const suffix = tag.slice(0, length);
+      if (clean.toLowerCase().endsWith(suffix)) clean = clean.slice(0, -length);
+    }
+  }
+  return clean;
+}
+
+function nextSpeechBoundary(text, force = false) {
+  const sentence = /[.!?…][”"'»)]*\s+/u.exec(text);
+  if (sentence) return sentence.index + sentence[0].length;
+  if (text.length >= MAX_SPEECH_CHUNK) {
+    const splitAt = text.lastIndexOf(' ', MAX_SPEECH_CHUNK);
+    return splitAt > 100 ? splitAt + 1 : MAX_SPEECH_CHUNK;
+  }
+  return force && text.trim() ? text.length : 0;
+}
+
+function queueSpeech(text, token) {
+  const clean = text.trim();
+  if (!clean || token !== speechToken) return;
+  const slot = { text, promise: requestFishAudio(clean, token) };
+  speechQueue.push(slot);
+  notifyQueue();
+  slot.promise.catch(() => {});
+}
+
+async function requestFishAudio(text, token) {
+  const response = await fetch(new URL('../../api/tts', location.href), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+    signal: AbortSignal.timeout(45_000),
+  });
+  if (!response.ok || !response.body) throw new Error('voice_unavailable');
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const audioParts = [];
+  const alignments = new Map();
+  let buffer = '';
+  let ended = false;
+
+  const consumeFrame = (frame) => {
+    const line = frame.split(/\r?\n/).find((item) => item.startsWith('data:'));
+    if (!line) return;
+    const raw = line.slice(5).trim();
+    if (!raw || raw === '[DONE]') return;
+    let event;
+    try { event = JSON.parse(raw); } catch { return; }
+    if (event.audio_base64) audioParts.push(decodeBase64(event.audio_base64));
+    if (event.alignment && Number.isFinite(Number(event.chunk_seq))) {
+      alignments.set(Number(event.chunk_seq), {
+        offset: Number(event.chunk_audio_offset_sec) || 0,
+        alignment: event.alignment,
+      });
+    }
+    if (token !== speechToken) ended = true;
+  };
+
+  while (!ended) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const frames = buffer.split(/\r?\n\r?\n/);
+    buffer = frames.pop() || '';
+    for (const frame of frames) consumeFrame(frame);
+  }
+  buffer += decoder.decode();
+  if (buffer.trim()) consumeFrame(buffer);
+  if (token !== speechToken) throw new Error('speech_cancelled');
+  const bytes = concatBytes(audioParts);
+  if (!bytes.length) throw new Error('voice_empty_audio');
+
+  const context = prepareAudio();
+  if (!context) throw new Error('audio_context_unavailable');
+  const audioBuffer = await context.decodeAudioData(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+  return { audioBuffer, timeline: buildTimeline(text, alignments, audioBuffer.duration) };
+}
+
+function decodeBase64(value) {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function concatBytes(parts) {
+  const result = new Uint8Array(parts.reduce((total, part) => total + part.length, 0));
+  let offset = 0;
+  for (const part of parts) { result.set(part, offset); offset += part.length; }
+  return result;
+}
+
+function normalizedMap(value) {
+  const chars = [];
+  const positions = [];
+  for (let index = 0; index < value.length; index += 1) {
+    const normalized = value[index].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+    if (/[\p{L}\p{N}]/u.test(normalized)) {
+      chars.push(normalized);
+      positions.push(index);
+    }
+  }
+  return { value: chars.join(''), positions };
+}
+
+function buildTimeline(text, alignments, duration) {
+  const source = normalizedMap(text);
+  const timeline = [];
+  let searchFrom = 0;
+  const chunks = [...alignments.entries()].sort(([left], [right]) => left - right);
+  for (const [, item] of chunks) {
+    for (const segment of item.alignment?.segments || []) {
+      const phrase = normalizedMap(String(segment.text || '')).value;
+      if (!phrase) continue;
+      const found = source.value.indexOf(phrase, searchFrom);
+      if (found < 0) continue;
+      const last = found + phrase.length - 1;
+      const from = timeline.length ? timeline[timeline.length - 1].to : 0;
+      const to = Math.max(from, source.positions[last] + 1);
+      timeline.push({
+        start: Math.max(0, item.offset + Number(segment.start || 0)),
+        end: Math.max(0, item.offset + Number(segment.end || 0)),
+        from,
+        to,
+      });
+      searchFrom = last + 1;
+    }
+  }
+
+  if (!timeline.length) {
+    return [{ start: 0, end: Math.max(0.5, duration), from: 0, to: text.length }];
+  }
+  if (timeline[timeline.length - 1].to < text.length) {
+    timeline[timeline.length - 1].to = text.length;
+  }
+  return timeline;
+}
+
+function revealCountAt(timeline, elapsed, length) {
+  let count = 0;
+  for (const segment of timeline) {
+    if (elapsed >= segment.end) {
+      count = Math.max(count, segment.to);
+      continue;
+    }
+    if (elapsed >= segment.start) {
+      const span = Math.max(0.035, segment.end - segment.start);
+      const progress = Math.max(0, Math.min(1, (elapsed - segment.start) / span));
+      count = Math.max(count, Math.floor(segment.from + (segment.to - segment.from) * progress));
+    }
+    break;
+  }
+  return Math.min(length, count);
+}
+
+function playFishAudio(item, text, token) {
+  return new Promise((resolve, reject) => {
+    const context = prepareAudio();
+    if (!context || token !== speechToken) { reject(new Error('speech_cancelled')); return; }
+    const source = context.createBufferSource();
+    source.buffer = item.audioBuffer;
+    source.connect(context.destination);
+    activeSource = source;
+    const startAt = context.currentTime + 0.035;
+    let visible = 0;
+    let raf = 0;
+    const paint = () => {
+      if (token !== speechToken) { cancelAnimationFrame(raf); resolve(); return; }
+      const elapsed = Math.max(0, context.currentTime - startAt);
+      const next = revealCountAt(item.timeline, elapsed, text.length);
+      if (next > visible) {
+        appendOutput(text.slice(visible, next));
+        visible = next;
+        window.Fluctlight?.pulse(0.08);
+      }
+      if (elapsed < item.audioBuffer.duration) raf = requestAnimationFrame(paint);
+      else {
+        if (visible < text.length) appendOutput(text.slice(visible));
+        window.Fluctlight?.setSpeaking(false);
+      }
+    };
+    source.onended = () => {
+      cancelAnimationFrame(raf);
+      if (token === speechToken) {
+        if (visible < text.length) appendOutput(text.slice(visible));
+        window.Fluctlight?.setSpeaking(false);
+      }
+      if (activeSource === source) activeSource = null;
+      resolve();
+    };
+    try {
+      source.start(startAt);
+      window.Fluctlight?.setThinking(false);
+      window.Fluctlight?.setTyping(false);
+      window.Fluctlight?.setSpeaking(true);
+      setStatus('speaking', 'Говорю…');
+      raf = requestAnimationFrame(paint);
+    } catch (error) { reject(error); }
+  });
 }
 
 function playBrowserSpeech(text, token) {
-  if (!('speechSynthesis' in window) || token !== speechToken || !voiceEnabled) {
-    setStatus('idle', 'Ответ готов');
-    return;
+  if (!('speechSynthesis' in window) || token !== speechToken) {
+    typeText(text, token);
+    return Promise.resolve();
   }
-
-  const voices = window.speechSynthesis.getVoices();
-  const lang = /[а-яё]/i.test(text) ? 'ru' : 'en';
-  const voice = voices.find((item) => item.lang?.toLowerCase().startsWith(lang) && /natural|online|google/i.test(item.name))
-    || voices.find((item) => item.lang?.toLowerCase().startsWith(lang));
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = voice?.lang || (lang === 'ru' ? 'ru-RU' : 'en-US');
-  if (voice) utterance.voice = voice;
-  utterance.rate = 1;
-  utterance.pitch = 1.02;
-
-  const finish = () => {
-    if (token !== speechToken) return;
-    window.Fluctlight?.setSpeaking(false);
-    if (!busy && !listening) setStatus('idle', 'Готов к вопросу');
-  };
-  utterance.onstart = () => {
-    if (token !== speechToken) return;
-    setStatus('speaking', 'Говорит · голос браузера');
-    window.Fluctlight?.setThinking(false);
-    window.Fluctlight?.setSpeaking(true);
-  };
-  utterance.onboundary = () => window.Fluctlight?.pulse(0.38);
-  utterance.onend = finish;
-  utterance.onerror = finish;
-  window.speechSynthesis.speak(utterance);
-}
-
-async function speakReply(text) {
-  if (!voiceEnabled) return;
-  const token = stopVoiceOutput();
-
-  try {
-    const response = await fetch(new URL('../../api/tts', location.href), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.slice(0, 1400) }),
-      signal: AbortSignal.timeout(35_000),
-    });
-    if (!response.ok) throw new Error('voice_unavailable');
-    const audioBlob = await response.blob();
-    if (token !== speechToken || !voiceEnabled) return;
-
-    activeAudioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(activeAudioUrl);
-    activeAudio = audio;
-    audio.preload = 'auto';
-    audio.addEventListener('play', () => {
-      if (token !== speechToken) return;
-      setStatus('speaking', 'Говорит · Fish Audio');
+  return new Promise((resolve) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    const lang = /[а-яё]/i.test(text) ? 'ru' : 'en';
+    const voice = speechSynthesis.getVoices().find((item) => item.lang?.toLowerCase().startsWith(lang));
+    utterance.lang = voice?.lang || (lang === 'ru' ? 'ru-RU' : 'en-US');
+    if (voice) utterance.voice = voice;
+    utterance.rate = 1;
+    let shown = 0;
+    let raf = 0;
+    const paint = () => {
+      if (token !== speechToken) { resolve(); return; }
+      const step = Math.min(text.length, shown + 2);
+      if (step > shown) { appendOutput(text.slice(shown, step)); shown = step; }
+      if (shown < text.length) raf = requestAnimationFrame(paint);
+    };
+    utterance.onstart = () => {
+      setStatus('speaking', 'Говорю…');
       window.Fluctlight?.setThinking(false);
+      window.Fluctlight?.setTyping(false);
       window.Fluctlight?.setSpeaking(true);
-      audioPulse = window.setInterval(() => window.Fluctlight?.pulse(0.3), 260);
-    }, { once: true });
-    audio.addEventListener('ended', () => finishAudio(audio, token), { once: true });
-    audio.addEventListener('error', () => finishAudio(audio, token), { once: true });
-    await audio.play();
-  } catch {
-    if (token !== speechToken || !voiceEnabled) return;
-    if (activeAudio) {
-      activeAudio.pause();
-      activeAudio.removeAttribute('src');
-      activeAudio.load();
-      activeAudio = null;
+      paint();
+    };
+    utterance.onboundary = () => window.Fluctlight?.pulse(0.25);
+    utterance.onend = utterance.onerror = () => {
+      cancelAnimationFrame(raf);
+      if (token === speechToken) {
+        if (shown < text.length) appendOutput(text.slice(shown));
+        window.Fluctlight?.setSpeaking(false);
+        window.Fluctlight?.setTyping(false);
+      }
+      resolve();
+    };
+    speechSynthesis.speak(utterance);
+  });
+}
+
+function typeText(text, token) {
+  return new Promise((resolve) => {
+    let index = 0;
+    const step = () => {
+      if (token !== speechToken || index >= text.length) { resolve(); return; }
+      appendOutput(text.slice(index, index + 2));
+      index += 2;
+      window.setTimeout(step, 28);
+    };
+    step();
+  });
+}
+
+async function playSpeechQueue(token) {
+  while (token === speechToken) {
+    if (queueCursor >= speechQueue.length) {
+      if (speechDone) return;
+      await new Promise((resolve) => queueWaiters.push(resolve));
+      continue;
     }
-    if (activeAudioUrl) URL.revokeObjectURL(activeAudioUrl);
-    activeAudioUrl = null;
-    clearInterval(audioPulse);
-    audioPulse = null;
-    window.Fluctlight?.setSpeaking(false);
-    playBrowserSpeech(text, token);
+    const slot = speechQueue[queueCursor++];
+    try {
+      const item = await slot.promise;
+      if (token !== speechToken) return;
+      await playFishAudio(item, slot.text, token);
+    } catch {
+      if (token !== speechToken) return;
+      window.Fluctlight?.setSpeaking(false);
+      await playBrowserSpeech(slot.text, token);
+    }
   }
 }
 
-function sanitizeReply(text) {
-  return String(text || '')
-    .replace(/<think>[\s\S]*?<\/think>/gi, '')
-    .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
-    .trim();
+async function readAssistantStream(messages, token) {
+  const response = await fetch(new URL('../../api/chat', location.href), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, stream: true }),
+    signal: AbortSignal.timeout(55_000),
+  });
+  if (!response.ok || !response.body) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || 'assistant_unavailable');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let rawReply = '';
+  let cleanedSent = '';
+  let pendingSpeech = '';
+  let finished = false;
+
+  const consumeFrame = (frame) => {
+    const data = frame.split(/\r?\n/).filter((line) => line.startsWith('data:')).map((line) => line.slice(5).trim()).join('\n');
+    if (!data) return;
+    if (data === '[DONE]') { finished = true; return; }
+    const payload = JSON.parse(data);
+    if (payload.error) throw new Error('assistant_provider_error');
+    const delta = payload.choices?.[0]?.delta?.content;
+    if (typeof delta !== 'string' || !delta) return;
+    rawReply += delta;
+    const cleaned = cleanStreamText(rawReply);
+    if (!cleaned.startsWith(cleanedSent)) {
+      cleanedSent = cleaned;
+      pendingSpeech = cleaned;
+      return;
+    }
+    const fresh = cleaned.slice(cleanedSent.length);
+    cleanedSent = cleaned;
+    if (!fresh) return;
+    pendingSpeech += fresh;
+    fullReply = cleaned;
+    window.Fluctlight?.setThinking(false);
+    window.Fluctlight?.setTyping(true);
+    let boundary = nextSpeechBoundary(pendingSpeech);
+    while (boundary) {
+      const speech = pendingSpeech.slice(0, boundary);
+      pendingSpeech = pendingSpeech.slice(boundary);
+      queueSpeech(speech, token);
+      boundary = nextSpeechBoundary(pendingSpeech);
+    }
+  };
+
+  while (!finished) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const frames = buffer.split(/\r?\n\r?\n/);
+    buffer = frames.pop() || '';
+    for (const frame of frames) consumeFrame(frame);
+  }
+  buffer += decoder.decode();
+  if (buffer.trim()) consumeFrame(buffer);
+  fullReply = cleanStreamText(rawReply).trim();
+  const leftover = pendingSpeech;
+  if (leftover.trim()) queueSpeech(leftover, token);
+  if (!fullReply) throw new Error('assistant_empty_reply');
+  return fullReply;
 }
 
-async function askAI(userText) {
+async function askAI(userText, token) {
   history.push({ role: 'user', content: userText });
-  setStatus('thinking', 'Думает…');
+  setStatus('thinking', 'Думаю…');
   window.Fluctlight?.setThinking(true);
-
-  const { el: aiEl, textNode } = addMessage('ai', '');
-  const cursor = document.createElement('span');
-  cursor.className = 'cursor';
-  cursor.setAttribute('aria-hidden', 'true');
-  aiEl.appendChild(cursor);
+  chatLog.dataset.streaming = 'true';
+  const player = playSpeechQueue(token);
 
   try {
-    const response = await fetch(new URL('../../api/chat', location.href), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: history.slice(-MAX_HISTORY_MESSAGES) }),
-      signal: AbortSignal.timeout(35_000),
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || 'assistant_unavailable');
-
-    const reply = sanitizeReply(payload.reply);
-    if (!reply) throw new Error('assistant_empty_reply');
-    textNode.data = reply;
+    const reply = await readAssistantStream(history.slice(-MAX_HISTORY_MESSAGES), token);
     history.push({ role: 'assistant', content: reply });
-    chatLog.scrollTop = chatLog.scrollHeight;
-    window.Fluctlight?.setThinking(false);
-    await speakReply(reply);
+    while (history.length > MAX_HISTORY_MESSAGES) history.shift();
+    speechDone = true;
+    notifyQueue();
+    await player;
+    if (token === speechToken && renderedReply.length < reply.length) appendOutput(reply.slice(renderedReply.length));
   } catch {
-    textNode.data = 'Сейчас не получилось ответить. Попробуй ещё раз чуть позже.';
-    setStatus('idle', 'Ответ не получен');
+    speechDone = true;
+    notifyQueue();
+    await player;
+    if (token === speechToken && fullReply && renderedReply.length < fullReply.length) appendOutput(fullReply.slice(renderedReply.length));
+    else if (token === speechToken && !renderedReply) replaceOutput('Сейчас не получилось ответить. Попробуй ещё раз чуть позже.');
+    setStatus('error', 'Ответ не получен');
     window.Fluctlight?.setThinking(false);
   } finally {
-    cursor.remove();
+    if (token === speechToken) {
+      chatLog.dataset.streaming = 'false';
+      window.Fluctlight?.setThinking(false);
+      window.Fluctlight?.setSpeaking(false);
+      window.Fluctlight?.setTyping(false);
+    }
   }
 }
 
@@ -192,20 +449,28 @@ async function submitMessage(value) {
   const text = value.trim();
   if (!text || busy) return;
   if (text.length > MAX_MESSAGE_LENGTH) {
-    setStatus('idle', 'Сократи сообщение до 2000 символов');
+    setStatus('error', 'Сократи сообщение до 2000 символов');
     return;
   }
 
   busy = true;
-  sendBtn.disabled = true;
-  chatSuggestions.hidden = true;
-  stopVoiceOutput();
+  chatInput.disabled = true;
+  prepareAudio();
+  const token = stopVoiceOutput();
+  speechQueue = [];
+  queueCursor = 0;
+  queueWaiters = [];
+  speechDone = false;
+  fullReply = '';
+  replaceOutput('');
+  chatLog.dataset.streaming = 'true';
   chatInput.value = '';
-  addMessage('user', text);
-  await askAI(text);
+  await askAI(text, token);
+  speechDone = true;
   busy = false;
-  sendBtn.disabled = false;
-  if (!listening && chatStatus.dataset.state !== 'speaking') setStatus('idle', 'Готов к вопросу');
+  chatInput.disabled = false;
+  chatInput.focus();
+  if (token === speechToken) setStatus('idle', 'Готов к сообщению.');
 }
 
 chatForm.addEventListener('submit', (event) => {
@@ -213,76 +478,5 @@ chatForm.addEventListener('submit', (event) => {
   submitMessage(chatInput.value);
 });
 
-chatSuggestions.querySelectorAll('[data-prompt]').forEach((button) => {
-  button.addEventListener('click', () => submitMessage(button.dataset.prompt));
-});
-
-addMessage('ai', 'Я — цифровой клон Аяна. Спроси меня о моих проектах, навыках или идее, которую хочешь сделать.');
-
-voiceBtn.addEventListener('click', () => {
-  voiceEnabled = !voiceEnabled;
-  voiceBtn.setAttribute('aria-pressed', String(voiceEnabled));
-  voiceBtn.title = voiceEnabled ? 'Озвучивать ответы' : 'Озвучивание выключено';
-  voiceBtn.setAttribute('aria-label', voiceBtn.title);
-  if (!voiceEnabled) {
-    stopVoiceOutput();
-    if (!busy) setStatus('idle', 'Озвучивание выключено');
-  } else if (!busy) {
-    setStatus('idle', 'Готов к вопросу');
-  }
-});
-
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-
-if (SpeechRecognition) {
-  recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = true;
-  recognition.lang = document.documentElement.lang.toLowerCase().startsWith('en') ? 'en-US' : 'ru-RU';
-
-  recognition.onstart = () => {
-    listening = true;
-    micBtn.setAttribute('aria-pressed', 'true');
-    setStatus('listening', 'Слушаю…');
-    window.Fluctlight?.setListening(true);
-  };
-  recognition.onresult = (event) => {
-    let interim = '';
-    let final = '';
-    for (let i = event.resultIndex; i < event.results.length; i += 1) {
-      const transcript = event.results[i][0].transcript;
-      if (event.results[i].isFinal) final += transcript;
-      else interim += transcript;
-    }
-    chatInput.value = (final + interim).trim();
-    if (final.trim()) {
-      recognition.stop();
-      submitMessage(final);
-    }
-  };
-  recognition.onend = () => {
-    listening = false;
-    micBtn.setAttribute('aria-pressed', 'false');
-    window.Fluctlight?.setListening(false);
-    if (!busy && chatStatus.dataset.state === 'listening') setStatus('idle', 'Готов к вопросу');
-  };
-  recognition.onerror = (event) => {
-    if (event.error === 'not-allowed') setStatus('idle', 'Разреши доступ к микрофону');
-  };
-  micBtn.addEventListener('click', () => {
-    if (busy) return;
-    if (listening) {
-      recognition.stop();
-      return;
-    }
-    stopVoiceOutput();
-    window.speechSynthesis?.cancel();
-    chatInput.value = '';
-    try { recognition.start(); } catch { setStatus('idle', 'Микрофон уже включён'); }
-  });
-} else {
-  micBtn.disabled = true;
-  micBtn.title = 'Голосовой ввод доступен в Chrome и Edge';
-  micBtn.setAttribute('aria-label', micBtn.title);
-}
+chatInput.addEventListener('input', () => window.Fluctlight?.pulse(0.025));
+setStatus('idle', 'Готов к сообщению.');

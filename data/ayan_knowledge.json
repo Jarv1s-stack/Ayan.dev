@@ -18,8 +18,8 @@
     "Telegram bot development"
   ],
   "projects": [
-    { "name": "Fluctlight", "description": "A first-person digital clone of Ayan inside an interactive Three.js light field, with text, voice input and Fish Audio speech." },
-    { "name": "Ayan.dev", "description": "A hand-built developer portfolio with a console-inspired interface, motion, certificates and an integrated AI clone." },
+    { "name": "Fluctlight", "description": "An interactive Three.js light field where visitors can talk with Ayan through text or voice." },
+    { "name": "Ayan.dev", "description": "A hand-built developer portfolio with a console-inspired interface, motion, certificates and an integrated AI conversation experience." },
     { "name": "Jarvis", "description": "A local, offline-first Windows assistant with voice control, file handling and automation through local AI models." },
     { "name": "Steppe Atlas", "description": "A route builder for slow travel in Kazakhstan with region filters and a live itinerary." },
     { "name": "Mori Studio", "description": "A digital studio landing page with a lightweight project planner and a downloadable brief." },

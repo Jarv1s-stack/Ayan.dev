@@ -679,3 +679,26 @@ footer{ border-top:1px solid var(--border); padding: 40px 0; }
 
 @media(max-width:620px){.contact-container{grid-template-columns:minmax(0,1fr)}.contact-info,.contact-form,.info-item,.info-item>div{min-width:0}#email-text{overflow-wrap:anywhere}}
 
+/* ---------------- Ayan consultation ---------------- */
+.consultation-section{padding-top:48px}
+.consultation-card{
+  position:relative; isolation:isolate; min-height:390px; overflow:hidden;
+  display:grid; grid-template-columns:minmax(0,1fr) 220px; align-items:center; gap:32px;
+  padding:clamp(30px,6vw,72px); border:1px solid var(--border); border-radius:var(--radius-lg,24px);
+  background:var(--surface);
+}
+.consultation-copy{position:relative;z-index:1;max-width:680px}
+.consultation-copy h2{max-width:620px;margin:0 0 16px;font-family:var(--font-display);font-size:clamp(2rem,4vw,3.5rem);line-height:1.08;letter-spacing:-.035em}
+.consultation-copy>p{max-width:590px;margin:0;color:var(--text-muted);font-size:1.05rem;line-height:1.75}
+.consultation-topics{display:flex;flex-wrap:wrap;gap:9px;margin:26px 0 30px}
+.consultation-topics span{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:var(--surface-2);color:var(--text-muted);font-family:var(--font-mono);font-size:.76rem}
+.consultation-cta{display:inline-flex;align-items:center;gap:11px}
+.consultation-note{position:relative;z-index:1;display:grid;place-items:center;color:var(--accent)}
+.consultation-note i{display:grid;place-items:center;width:104px;height:104px;border:2px solid var(--accent);border-radius:50%;background:var(--surface-2);font-size:2rem}
+.consultation-orbit{position:absolute;z-index:-1;right:-145px;top:-175px;width:530px;aspect-ratio:1;border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:50%;transform:rotate(-24deg)}
+.consultation-orbit::before,.consultation-orbit::after{content:'';position:absolute;inset:12%;border:1px solid color-mix(in srgb,var(--accent) 13%,transparent);border-radius:50%;transform:rotate(52deg) scaleX(.56)}
+.consultation-orbit::after{inset:24%;transform:rotate(-48deg) scaleX(.74)}
+.consultation-orbit span{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+.consultation-orbit span:nth-child(1){left:18%;top:22%}.consultation-orbit span:nth-child(2){right:22%;top:37%;width:5px;height:5px}.consultation-orbit span:nth-child(3){right:34%;bottom:12%;width:4px;height:4px}
+@media(max-width:760px){.consultation-card{grid-template-columns:1fr;min-height:0}.consultation-note{display:none}.consultation-orbit{right:-300px;top:-220px}}
+

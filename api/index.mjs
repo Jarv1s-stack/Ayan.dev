@@ -158,7 +158,7 @@ async function handleContact(request) {
   const telegram = clean(payload.telegram, 80) || 'Not provided';
   const subject = clean(payload.subject, 120);
   const message = clean(payload.message, 2_000);
-  if (!name || !phone || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !subject || !message) {
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !subject || !message) {
     return json({ error: 'required_fields_missing' }, 400);
   }
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -169,7 +169,7 @@ async function handleContact(request) {
     'New portfolio inquiry',
     '',
     `Name: ${name}`,
-    `Phone: ${phone}`,
+    `Phone: ${phone || 'Not provided'}`,
     `Email: ${email}`,
     `Telegram: ${telegram}`,
     `Subject: ${subject}`,
